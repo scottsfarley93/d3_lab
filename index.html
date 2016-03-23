@@ -25,19 +25,23 @@
 		<div id='main' class='row'>
 			<div class='col-xs-4' id='filterControls'>
 				<h2 class='page-header'>FEMA Disaster Declarations</h2>
-				<div id='typeFilter'></div>
-				<div id='timeFilter'>
-					<label>Min Year:</label><input type='number' min="1964" step='1' value="1964" max='2016' id='filterMinYear'/><br />
-					<label>Max Year:</label><input type='number' min="1964" step='1' value="2016" max='2016' id='filterMaxYear'/>
+				<div id='typeFilter'>
+					<select id='typeSelect'></select><br />
+					<label>Filter by Month</label><br/>
+					<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
+					<label>Filter by Year</label><br/>
+					<span>Min Year: </span><span id='minYearText'>1960</span><input type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
 				</div>
-				<button class='btn'>Reset All Filters</button>
 				
 			</div>
 			<div class='col-xs-8' id='infoViz'></div>
 		</div>
 		<div id='status'>
-			<progress id='loadProgress' max="100"></progress>
-			<div>Currently doing: <span id='currentTask'></span></div>
+			<progress id='loadProgress' max="100"></progress> <br />
+			<div>Currently doing: <span id='currentTask'></span></div><br />
+			<div>Files loaded: <span id='filesLoaded'></span></div>
+			<div>Current Number of Disasters: <span id='currentNumDisasters'></span></div>
+			<div id='pieChart'></div>
 		</div>
 		
 		
@@ -46,6 +50,8 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js'></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
 	<script src='assets/js/main.js'></script>
 	</body>
 </html>
