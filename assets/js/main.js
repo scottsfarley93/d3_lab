@@ -7,6 +7,14 @@
 // underscore.js
 // date.js
 
+//TODO:
+//automatic scale calculation
+//normalize on States
+//display states
+//pie chart for states
+//bar chart for months
+//bar chart for years
+//popup over map
 
 
 var globals = {};
@@ -19,6 +27,7 @@ globals.activeData = []; // this is the raw fema data
 globals.currentTypeFilter = "All"; //keeps track of any type filter that has been applied;
 globals.filteredData; //this is the data that has the current filter applied
 globals.map = {} //central choropleth related information
+globals.barcharts = {}
 globals.map.margins = {
 	top: 50,
 	left: 50,
@@ -33,6 +42,13 @@ globals.temporalFilter = {
 }; //this is the current filter on years and months
 
 globals.pie = {};//pie chart stuff
+globals.statesPie = {} //states pie chart stuff
+globals.currentTotal = 0; //total number of disasters with current filters;
+globals.mapConfig = {};
+globals.mapConfig.geogType = 'Counties';
+globals.mapConfig.normType = "None";
+globals.mapConfig.inputData = []
+
 
 /////-----Important action functions ----////////
 $(document).ready(function(){
@@ -50,8 +66,12 @@ function loadPlatform(){
 	globals.allDisasterTypes = getAllDisasterTypes(globals.data.fema);
 	 populateTypeSelect(); //creates the type selection dropdown menu
 	 createMap(); // creates the map
-	 buildPieChart(calculatePieChartComp(globals.data.fema)); //builds a pie chart of the composition by type
-	 updateMap("Counties", "None", globals.data.fema);//colors the choropleth map 
+	 buildTypePieChart(calculatePieChartComp(aggregateByType(globals.data.fema))); //builds a pie chart of the composition by type
+	 buildStatesPieChart(calculatePieChartComp(aggregateByState(globals.data.fema)));//builds a pie chart of the composition by states
+	 //set up the map with the default config
+	 globals.mapConfig.inputData = globals.data.fema;
+	 buildBarCharts();//these are the filter charts
+	 updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.data.fema);//colors the choropleth map 
 }
 
 function populateTypeSelect(){
@@ -81,7 +101,7 @@ function populateTypeSelect(){
 		}
 		//apply any existing temporal filtering
 		newData = filterByTimeRange(newData, globals.temporalFilter);
-		updateMap("Counties", "Pop", newData);		
+		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData);		
 		globals.filteredData = newData;
 		 
 	});
@@ -114,7 +134,7 @@ function configureTimeFilter(){
 	}
 	//now do the temporal filtering
 	newData = filterByTimeRange(newData, globals.temporalFilter);
-	updateMap("Counties", "Pop", newData);
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData);
 	globals.filteredData = newData;
 }
 
@@ -234,204 +254,7 @@ function loadMapData(){
 		}
 	});	 
 }
-///////////UTILITY FUNCTIONS///////////////
-//basic utils
-function getCountyDetails(fips){
-	//returns a metadata object by looking up the fips value in the metadata set 
-	//returns an object with keys ['StateCode', "Pop", "LandArea", "FIPS", "Geography"]
-	fips = fips.toString();
-	data = globals.data.countyMetadata;
-	data = data[fips]
-	return data;
-}
-function resetTemporalFilter(){
-	globals.temporalFilter = {
-		minYear: 1960,
-		maxYear: 2016,
-		minMonth: 1,
-		maxMonth: 12, 
-	};
-}
 
-function resetTypeFilter(){
-	globals.currentTypeFilter = "All";
-}
-
-function getStateDetails(stateCode){
-	//returns a metadata object by looking up the state code in the state metadata set
-	//returns an object with keys ["state", "FIPS", "Pop", "Area"]
-	data = globals.data.stateMetadata[stateCode];
-	return data;
-}
-
-function getAllDisasterTypes(inputData){
-	//gets all of unique types in an input data array
-	t = _.pluck(inputData, 'incidentType');
-	t = _.uniq(t);
-	return t;
-}
-
-function checkFIPS(fips){
-	//adds a preceeding zero if the given fips is only four digits long, otherwise returns the input fips
-	fips = fips.toString();
-	if (fips.length == 4){
-		fips = "0" + fips
-	}
-	return fips;
-}
-
-
-function getRandomColor() { //for debug
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-//these functions get a unique array of different properties we might like to know about
-function getAllStates(inputData){
-	states = _.pluck(inputData, 'State');
-	states = _.uniq(states);
-	return states;
-}
-function getAllCounties(inputData){
-	counties = _.pluck(inputData, "FIPSCode");
-	counties = _.uniq(counties);
-	return counties;
-}
-function getAllYears(inputData){
-	years = _.pluck(inputData, "StartYear");
-	years = _.uniq(years);
-	return years;
-}
-function getAllMonths(inputData){
-	months = _.pluck(inputData, "StartMonth");
-	months = _.uniq(months);
-	return months;
-}
-
-function sumOverData(inputData, numericField){
-	//returns the total number of values within a list of data
-	s = 0;
-	_.map(inputData, function(item){
-		val = item['numericField'];
-		s += val;
-	});
-	return val;
-}
-
-
-//FILTER CONTROLS
-function filterByState(inputData, stateCode){
-	//returns an array of data containing records that only occur in the given input state --> input is a data array and a two letter state code
-	f = _.where(inputData, {State : stateCode});
-	return f;
-}
-function filterByCounty(inputData, fips){
-	//returns an array of data containing records that only occur in the given county --> input is a data array and a fips code
-	f = _.where(inputData, {FIPSCode: fips});
-	return f;
-}
-function filterByYear(inputData, year){
-	//returns an array of data containing records that only occur in the given year --> input is a a data array and a four digit year
-	f = _.where(inputData, {'StartYear': year});
-}
-function filterByType(inputData, type){
-	//returns an array of data containing records of a given type --> input is a data array and a string referencing a distaster type
-	f = _.where(inputData, {incidentType: type});
-	return f
-}
-function filterByTimeRange(inputData, temporalFilter){
-	//returns an array of data containing records whose startYears fall between the minYear and maxYear input parameters 
-	minYear = temporalFilter.minYear;
-	maxYear = temporalFilter.maxYear;
-	minMonth = temporalFilter.minMonth;
-	maxMonth = temporalFilter.maxMonth;
-	
-	f = _.filter(inputData, function(item){
-		if ((+item['StartYear'] >= +minYear) && (+item['StartYear'] <= +maxYear) && (+item['StartMonth'] >= +minMonth) && (+item['StartMonth'] <= +maxMonth)){
-			return true;
-		}
-	});
-	return f;
-}
-
-//AGGREGATE CONTROLS
-function aggregateByType(inputData){
-	//returns an object with {type: count} pairs for all disaster types in the input dataset --> input is an array, output is an object
-	a = _.groupBy(inputData, function(item){
-		return item['incidentType'];
-	});
-	return a;
-}
-function aggregateByYear(inputData){
-	//returns an object with {year:count} pairs for all years in the input dataset--> input is an array, output is an object
-	//aggregates by start year, so if the disaster spans multiple years, only the start year counts
-	a = _.groupBy(inputData, function(item){
-		return item['StartYear'];
-	});
-	return a;
-}
-
-function aggregateByState(inputData){
-	//returns an object with {state:count} pairs for all states in the input dataset--> input is an array, output is an object
-	a = _.groupBy(inputData, function(item){
-		return item['State'];
-	});
-	return a;
-}
-function aggregateByCounty(inputData){
-	//returns an object with {county: county} pairs for all counties in the input dataset--> input is an array, output is an object
-	a = _.groupBy(inputData, function(item){
-		return item['FIPSCode'];
-	});
-	return a;
-}
-
-//display functions
-
-function calculatePieChartComp(inputData, weights){
-	//input data should be an filtered Data array
-	numTotal = inputData.length;
-	agg = aggregateByType(inputData);
-	pie = [];
-	aggNum = _.each(agg, function(value, key, list){
-		pie.push({Type: key, Value: list[key].length});
-	});
-	return pie;
-}
-function displayMapTotal(input){
-	//displays the total number of disasters on the map at this point in time
-	//map always shows filteredData
-	 l = input.length;
-	$("#currentNumDisasters").text(l);
-}
-
-//NORMALIZATION controls
-function normalize(geographyType, normalizationType, inputObject){
-	//returns an array of data values with a {'State' : NormalizedCount} value pairs
-	//for use with aggregated state and county data
-	//input should be an object of type {{"State" : "RawCount"}...} as returned by aggregateByState() or aggregateByCounty()
-	keys = _.keys(globals.data.countyMetadata);
-	n = _.map(inputObject, function(value, key){
-		//get the land area
-		numDis = value.length;
-		geog = checkFIPS(key.toString());
-		i = keys.indexOf(geog) 
-		out = {};
-		out['geography'] = geog;
-		out['normType'] = "Check";
-		if (i == -1){
-			out['value'] = -1
-		}else{
-			out['value'] = numDis;
-		}
-		return out
-	});
-	return n;
-}
 
 
 //MAP CONTROLS
@@ -439,18 +262,19 @@ function normalize(geographyType, normalizationType, inputObject){
 function createMap(){
 	//draws a blank map
 	//set props
-	var width = 960,
-    height = 600;
+	var width = $("#map").width(),
+    height = $("#map").height();
+    console.log(height + "x" + width)
 	
 	//get projection ready
 	var projection = d3.geo.albersUsa()
-	    .scale(1280)
+	    .scale(1000)
 	    .translate([width / 2, height / 2]);
 	
 	var path = d3.geo.path()
 	    .projection(projection);
 	
-	globals.map.map = svg = d3.select("body").append("svg")
+	globals.map.map = svg = d3.select("#map").append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
 	//make globals
@@ -480,7 +304,6 @@ function createMap(){
      globals.map.counties.on('click', function(){
      	thisFips = d3.select(this).attr('FIPS');
      	metadata = globals.data.countyMetadata[thisFips];
-     	console.log(this)
      	//styling
      	d3.select(this).style('fill', 'red');
      });
@@ -493,38 +316,52 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	//function aggreages to the desired geography and then sets the choropleth colors
 	//returns nothing
 		//this deals with the colors
-	globals.map.colorScale = d3.scale.threshold() //map values to colors
+	
+	//different breakpoints on the color scale
+	console.log("Geography Type: " + geographyType);
+	console.log("Normalization Type: " + normalizationType);
+	if (normalizationType == "None"){
+			globals.map.colorScale = d3.scale.threshold() //map values to colors
         .domain([ 0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 100, 200])
+	}else if (normalizationType== "Area"){
+			globals.map.colorScale = d3.scale.threshold() //map values to colors
+        .domain([0.00001, 0.00010, 0.00025, 0.00040, 0.00050, 0.0007500, 0.00100, 0.005, 0.01, 0.025, 0.05, 1])
+	}
+	globals.map.colorScale
     	.range(['white', 'white', '#e3b3b3', '#d58d8d', '#c76666', '#ba4141', '#a73a3a', '#822d2d', '#6f2727', '#5d2020', '#4a1a1a', '#371313', '#250d0d', 'black']);
 	//States isn't working yet
-	if (geographyType == "States"){
-		console.log("State level geography choropleth is not supported at this time.");
-	}else if(geographyType == 'Counties'){
+	 if(geographyType == 'Counties'){
 		toMap = aggregateByCounty(filteredInput);
-		toMap = normalize("County", "Pop", toMap);
+		globals.map.aggregateData = toMap;
+		if (normalizationType == "Area"){
+			toMap = normalize("Counties", "Area", toMap);
+		}else if (normalizationType == "None"){
+			toMap = normalize("Counties", "None", toMap);
+		}
 		idToValueMap = {};
 		//populate the id/value lookup
 	    _.each(toMap, function(d){
 	    	idToValueMap[checkFIPS(d.geography).toString()] = {value: +d.value, geography: checkFIPS(d.geography)};});
-	    allIDS = []
+	    allIDS = [];
 	    globals.map.counties.style('fill', function(d){
 	    	thisID = checkFIPS(d3.select(this).attr('FIPS'));
 	    	allIDS.push(thisID);
 			lookup = idToValueMap[thisID];
+			globals.map.idToValueMap = idToValueMap
 			//if it is not in idToValueMap, then it means that the filtered value is zero (no disasters);
 			//lookup will be undefined
 			//so you a try catch block and set value to zero
 			try{
 				thisValue = idToValueMap[thisID].value;
+				
 			}catch (err){
 				thisValue = 0;
 			}
 			if (thisValue == -1){
-				return 'red';
+				return 'gray';
 			}else if (thisValue >= 0){
 				return globals.map.colorScale(thisValue);
 			}
-			//return globals.map.colorScale(thisValue);
 	   });
 
 	   globals.map.counties.on('click', function(d){
@@ -534,7 +371,7 @@ function updateMap(geographyType, normalizationType, filteredInput){
 			//if it is not in idToValueMap, then it means that the filtered value is zero (no disasters);
 			//lookup will be undefined
 			//so you a try catch block and set value to zero
-			thisValue = idToValueMap[thisID];
+			thisValue = globals.map.idToValueMap[thisID];
 			if (thisValue){
 				thisValue = thisValue.value
 			}else{
@@ -545,112 +382,475 @@ function updateMap(geographyType, normalizationType, filteredInput){
 			console.log(detailList);
 	   });
 	   
-	}else if (geographyType == "States"){
-		toMap = aggregateByCounty(filteredInput);
-		toMap = normalize("County", "Pop", toMap);
-		idToValueMap = {};
-		//populate the id/value lookup
-	    _.each(toMap, function(d){
-	    	idToValueMap[checkFIPS(d.geography).toString()] = {value: +d.value, geography: checkFIPS(d.geography)};});
-	    allIDS = []
-	    globals.map.counties.style('fill', function(d){
-	    	thisID = checkFIPS(d3.select(this).attr('FIPS'));
-	    	allIDS.push(thisID);
-			lookup = idToValueMap[thisID];
-			//if it is not in idToValueMap, then it means that the filtered value is zero (no disasters);
-			//lookup will be undefined
-			//so you a try catch block and set value to zero
-			try{
-				thisValue = idToValueMap[thisID].value;
-			}catch (err){
-				thisValue = 0;
-			}
-			if (thisValue == -1){
-				return 'red';
-			}else if (thisValue >= 0){
-				return globals.map.colorScale(thisValue);
-			}
-			//return globals.map.colorScale(thisValue);
-	   });
-
-	   globals.map.counties.on('click', function(d){
-	    	thisID = checkFIPS(d3.select(this).attr('FIPS'));
-	    	allIDS.push(thisID);
-			lookup = idToValueMap[thisID];
-			//if it is not in idToValueMap, then it means that the filtered value is zero (no disasters);
-			//lookup will be undefined
-			//so you a try catch block and set value to zero
-			thisValue = idToValueMap[thisID];
-			if (thisValue){
-				thisValue = thisValue.value;
-			}else{
-				thisValue = 0;
-			}
-			console.log(thisValue);
-			detailList = _.where(filteredInput, {FIPSCode:thisID});
-			console.log(detailList);
-	   });
+	   	//tooltips //TODO: Change to popup overlay
+	 globals.map.tip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+	  .html(function(d){
+	  	details = getCountyDetails(checkFIPS(d.id));
+	  	try{
+	  		val = globals.map.aggregateData[checkFIPS(d.id)].length
+	  	}catch(err){
+	  		val = 0
+	  	}
+		  	html = "<h6 class='page-header'>" + details.Geography + "</h6><br />"
+		  	html += "<label>Land Area: </label><span class='text-muted'>" + details.LandArea + " km<sup>2</sup></span><br />"
+		  	html += "<label>Population: </label><span class='text-muted'>" + details.Pop + "</span><br />"
+		  	html += "<label>Number of Disasters: </label><span class='text-muted'>" + val+ "</span><br />"
+		  	html += "<label>Percent of National Total: </label><span class='text-muted'>" + val/globals.currentTotal * 100+ "</span><br />"
+		 return html
+	  	
+	  })
+	  
+	  globals.map.canvas.call(globals.map.tip)//enable the tooltip
+	  
+	  globals.map.counties.on('mouseover', globals.map.tip.show)
+	  globals.map.counties.on('mouseout', globals.map.tip.hide)
+	   
+	} // end counties block
+	else if (geographyType == "States"){
+		return 
 	}
+	
+	globals.filteredData = filteredInput
+	//do other updates
 	displayMapTotal(filteredInput);
-	console.log("Here comes pie chart");
-	pie = calculatePieChartComp(filteredInput);
-	updatePieChart(pie);
+	updateTypePieChart();
+	updateStatesPieChart();
+	updateBarCharts(filteredInput, globals.temporalFilter);
 };
 
 //build the pie chart showing composition
-function buildPieChart(data){
+function buildTypePieChart(data){
 	//build the chart
-	globals.pie.height = 500;
-	globals.pie.width = 500;
+	globals.pie.height = $("#typeChartHolder").height();
+	globals.pie.width = $("#typeChartHolder").width();
 	globals.pie.radius = Math.min(globals.pie.width, globals.pie.height) / 2;
-	globals.pie.colorScale = d3.scale.ordinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+	globals.pie.colorScale = d3.scale.category20();
     
     globals.pie.arc = d3.svg.arc()
     .outerRadius(globals.pie.radius - 10)
     .innerRadius(0);
     
-    globals.pie.labelArc = d3.svg.arc()
-    .outerRadius(globals.pie.radius - 40)
-    .innerRadius(globals.pie.radius - 40);
-    
-   globals.pie.chart = d3.layout.pie()
-    .sort(null)
+    // globals.pie.labelArc = d3.svg.arc()
+    // .outerRadius(globals.pie.radius - 40)
+    // .innerRadius(globals.pie.radius - 40);
+//     
+   globals.pie.pie = d3.layout.pie()
+    .sort(function(d){return d.Value})
     .value(function(d) { return d.Value; });
+      
+   d3.selectAll(".temporalSlider")
+      .on("change", function(){
+      	updateTypePieChart();
+      });
   
-  globals.pie.svg = d3.select("#pieChart").append("svg")
+  globals.pie.svg = d3.select("#typeChartHolder").append("svg")
     .attr("width", globals.pie.width)
     .attr("height", globals.pie.height)
   .append("g")
     .attr("transform", "translate(" + globals.pie.width / 2 + "," + globals.pie.height / 2 + ")");
-    
-   	  var g = globals.pie.svg.selectAll(".arc")
-      .data(globals.pie.chart(data))
+}
+
+
+
+function updateTypePieChart(){
+	// //update the pie chart with new data  
+	console.log('pie update'); 
+	inputData = globals.filteredData
+	data = calculatePieChartComp(aggregateByType(inputData)) // this will have been updated by the event listeners  
+	globals.pie.svg.selectAll(".arc")
+		.remove()
+   globals.pie.path = globals.pie.svg.selectAll(".arc")
+      .data(globals.pie.pie(data))
     .enter().append("g")
-      .attr("class", "arc");
+      .attr("class", "arc")
+      .attr('type', function(d){
+      	return d.data.Category
+      })
+      .attr('dataValue', function(d){
+      	return d.data.Value
+      });
       
-    g.append("path")
+    globals.pie.path.append("path")
       .attr("d", globals.pie.arc)
       .style("fill", function(d) { 
-      	color = globals.pie.colorScale(d.data.Type)
+      	color = globals.pie.colorScale(d.data.Category)
       	return color; });
 
-  g.append("text")
-      .attr("transform", function(d) { return "translate(" + globals.pie.labelArc.centroid(d) + ")"; })
-      .attr("dy", ".35em")
-      .text(function(d) { return d.data.Type; });
+  // globals.pie.path.append("text")
+      // .attr("transform", function(d) { return "translate(" + globals.pie.labelArc.centroid(d) + ")"; })
+      // .attr("dy", ".35em")
+      // .text(function(d) { return d.data.Type; });
    
+	 //here is the tooltip for this item
+	 globals.pie.tip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+
+
+ //event listeners
+	globals.pie.svg.call(globals.pie.tip)//enable the tooltip
+      
+ globals.pie.path.on('mouseover', function(){
+ 	var slice = d3.select(this);
+ 	slice.attr('stroke', 'white');
+ 	var disType = slice.attr('type');
+ 	var disVal = slice.attr('dataValue');
+ 	if (globals.currentTotal != 0){//catch div!/0 errors
+ 		var disPct = Math.round((disVal / globals.currentTotal) * 100); //percent of total
+ 	}
+ 	else{
+ 		var disPct = 0;
+ 	}
+ 	var txt = "<label>" + disType + ":  </label><span>" + disVal + "   </span><span class='text-muted'>(" + disPct + "%)</span>";
+ 	globals.pie.tip.html(txt);
+ 	globals.pie.tip.show()
+ });
+ globals.pie.path.on('mouseout', function(){
+ 	d3.select(this).attr('stroke', 'none') // clear the formatting
+ 	globals.pie.tip.hide()
+ });
+ 
+
+ 
 }
 
-function updatePieChart(data){
-	// //update the pie chart with new data\
-//       
-    globals.pie.chart.value(function(d) { return d.Type; }); // change the value function
-    path = globals.pie.svg.data(globals.pie.chart); // compute the new angles
-    path.attr("d", globals.pie.arc); // redraw the arcs
+function buildBarCharts(){
+	//temporal unit is either Year, Month
+	//builds a base bar chart on top of which the filter is displayed
+	globals.barcharts.width = $("#yearBarChart").width() ;//same for both charts
+	globals.barcharts.height = $("#yearBarChart").height() * .8;
+	globals.barcharts.margins = {
+		top: 5,
+		bottom: 25,
+		left: 0,
+		right: 0
+	}
+	//prep the data
+	var monthAgg = aggregateByMonth(globals.data.fema);
+	var monthData = _.map(monthAgg, function(value, key){
+		return {month: key,
+		value: +value.length}
+	})
+	var yearAgg = aggregateByYear(globals.data.fema)
+	var yearData = _.map(yearAgg, function(value, key){
+		return {year: key,
+		value: +value.length}
+	})
+	//Months
+	globals.barcharts.monthBarCanvas = d3.select("#monthBarChart").append('svg')
+		.attr('height', globals.barcharts.height + globals.barcharts.margins.top + globals.barcharts.margins.bottom)
+		.attr('width', globals.barcharts.width + globals.barcharts.margins.left + globals.barcharts.margins.right)	
+	//we will use these later
+	globals.barcharts.monthX = d3.scale.ordinal()
+    .rangeRoundBands([0, globals.barcharts.width], .1);
+    
+    globals.barcharts.monthY = d3.scale.linear()
+    .range([globals.barcharts.height, 0]);
+    
+    globals.barcharts.monthxAxis = d3.svg.axis()
+    .scale(globals.barcharts.monthX)
+    .orient("bottom");
+
+	globals.barcharts.monthyAxis = d3.svg.axis()
+	    .scale(globals.barcharts.monthY)
+	    .orient("left")
+	    .ticks(10);
+	
+	globals.barcharts.monthX.domain(monthData.map(function(d) { 
+		console.log(d.month)
+		return d.month.toString(); }));
+  	globals.barcharts.monthY.domain([0, d3.max(monthData, function(d) {
+  		 return +d.value; })]);
+
+  	globals.barcharts.monthBarCanvas.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + globals.barcharts.height + ")")
+      .call(globals.barcharts.monthxAxis);
+      
+      globals.barcharts.monthBarCanvas.append("g")
+      .attr("class", "y axis")
+      .call(globals.barcharts.monthyAxis)
+    // // .append("text")
+      // // .attr("transform", "rotate(-90)")
+      // // .attr("y", 6)
+      // // .attr("dy", ".71em")
+      // // .style("text-anchor", "end")
+      // // .text("Num Dis");
+// 	
+// 	
+	globals.barcharts.monthBars = globals.barcharts.monthBarCanvas.selectAll(".bar")
+      .data(monthData)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) {
+      	return globals.barcharts.monthX(d.month); })
+      .attr("width", globals.barcharts.monthX.rangeBand())
+      .attr("y", function(d) { return globals.barcharts.monthY(+d.value); })
+      .attr("height", function(d) { return globals.barcharts.height - globals.barcharts.monthY(+d.value); })
+      .style('fill', 'darkgray')
+      
+      
+      //////////////
+      	//Years
+	globals.barcharts.yearBarCanvas = d3.select("#yearBarChart").append('svg')
+		.attr('height', globals.barcharts.height + globals.barcharts.margins.top + globals.barcharts.margins.bottom)
+		.attr('width', globals.barcharts.width + globals.barcharts.margins.left + globals.barcharts.margins.right)
+	
+	globals.barcharts.yearX = d3.scale.ordinal()
+    .rangeRoundBands([0, globals.barcharts.width], .1);
+    
+    globals.barcharts.yearY = d3.scale.linear()
+    .range([globals.barcharts.height, 0]);
+    
+    globals.barcharts.yearxAxis = d3.svg.axis()
+    .scale(globals.barcharts.yearX)
+    .orient("bottom")
+
+
+	globals.barcharts.yearyAxis = d3.svg.axis()
+	    .scale(globals.barcharts.yearY)
+	    .orient("left")
+	
+	globals.barcharts.yearX.domain(yearData.map(function(d) { 
+		return d.year; }));
+  	globals.barcharts.yearY.domain([0, d3.max(yearData, function(d) {
+  		 return +d.value; })]);
+
+  	globals.barcharts.yearBarCanvas.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + globals.barcharts.height + ")")
+      .call(globals.barcharts.yearxAxis);
+      
+      globals.barcharts.yearBarCanvas.append("g")
+      .attr("class", "y axis")
+      .call(globals.barcharts.yearyAxis)
+    // // .append("text")
+      // // .attr("transform", "rotate(-90)")
+      // // .attr("y", 6)
+      // // .attr("dy", ".71em")
+      // // .style("text-anchor", "end")
+      // // .text("Num Dis");
+// 	
+// 	
+	globals.barcharts.yearBars = globals.barcharts.yearBarCanvas.selectAll(".bar")
+      .data(yearData)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) {
+      	return globals.barcharts.yearX(d.year); })
+      .attr("width", globals.barcharts.yearX.rangeBand())
+      .attr("y", function(d) { return globals.barcharts.yearY(+d.value); })
+      .attr("height", function(d) { return globals.barcharts.height - globals.barcharts.yearY(+d.value); })
+      .style('fill', 'darkgray')
+
 }
 
-//CALCULATE CONTROLS
+function updateBarCharts(data, temporalFilter){
+	//this actually just draws a new bar chart over the existing one with the temporal filter applied.  Uses the same scales
+
+
+	globals.barcharts.yearBarCanvas.selectAll(".update-bar")
+		.remove() // clear the old stuff
+	
+	globals.barcharts.monthBarCanvas.selectAll(".update-bar")
+		.remove() // clear the old month stuff
+
+		//prep the data
+	var monthAgg = aggregateByMonth(data);
+	var monthData = _.map(monthAgg, function(value, key){
+		return {month: key,
+		value: +value.length}
+	})
+	var yearAgg = aggregateByYear(data)
+	console.log(yearAgg)
+	var yearData = _.map(yearAgg, function(value, key){
+		return {year: key,
+		value: +value.length}
+		})
+	
+	   //tooltips
+   //year chart
+	 globals.barcharts.yearTip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+	  .html(function(d){
+	  	return "<label>" + d.year + ":  </label><span class='text-muted'>" + d.value + "</span>"
+	  })
+	  
+	  globals.barcharts.yearBarCanvas.call(globals.barcharts.yearTip)//enable the tooltip
+	 
+	 
+	 //month chart 
+	 globals.barcharts.monthTip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+	  .html(function(d){
+	  	return "<label>" + d.month + ":  </label><span class='text-muted'>" + d.value + "</span>"
+	  })
+	  
+	  globals.barcharts.yearBarCanvas.call(globals.barcharts.monthTip)//enable the tooltip
+	
+	//stuff for year bars
+	console.log(d3.extent(yearData, function(d){ return +d.year}))
+	globals.barcharts.yearBarCanvas.selectAll(".update-bar")
+      .data(yearData)
+    .enter().append("rect")
+      .attr("class", "update-bar")
+      .attr("x", function(d) {
+      	return globals.barcharts.yearX(d.year); })
+      .attr("width", globals.barcharts.yearX.rangeBand())
+      .attr("y", function(d) { return globals.barcharts.yearY(+d.value); })
+      .attr("height", function(d) { return globals.barcharts.height - globals.barcharts.yearY(+d.value); })
+      .style('fill', 'darkred')
+      .on('mouseover', globals.barcharts.yearTip.show)
+      .on('mouseout', globals.barcharts.yearTip.hide)
+	
+	
+	globals.barcharts.monthBarCanvas.selectAll(".update-bar")
+      .data(monthData)
+    .enter().append("rect")
+      .attr("class", "update-bar")
+      .attr("x", function(d) {
+      	return globals.barcharts.monthX(d.month); })
+      .attr("width", globals.barcharts.monthX.rangeBand())
+      .attr("y", function(d) { return globals.barcharts.monthY(+d.value); })
+      .attr("height", function(d) { return globals.barcharts.height - globals.barcharts.monthY(+d.value); })
+      .style('fill', 'darkred')
+      .on('mouseover', globals.barcharts.monthTip.show)
+      .on('mouseout', globals.barcharts.monthTip.hide)
+   
+   
+   //tooltips
+   //year chart
+	 globals.barcharts.yearTip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+	  .html(function(d){
+	  	return "<label>" + d.year + "</label><span class='text-muted'>" + d.value + "</span>"
+	  });
+ //event listeners
+}
+
+/// Handle window resize
+function onResize(){
+	//on document resize
+	clearMap();
+	createMap();
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);	
+}
+$(window).resize(function(){
+	onResize();
+});
+
+
+
+//build the pie chart showing composition
+function buildStatesPieChart(data){
+	console.log("Built states pie chart.")
+	//build the chart
+	globals.statesPie.height = $("#stateChartHolder").height();
+	globals.statesPie.width = $("#stateChartHolder").width();
+	globals.statesPie.radius = Math.min(globals.pie.width, globals.pie.height) / 2;
+	globals.statesPie.colorScale = d3.scale.category20();
+    
+    globals.statesPie.arc = d3.svg.arc()
+    .outerRadius(globals.pie.radius - 10)
+    .innerRadius(0);
+    
+    // globals.pie.labelArc = d3.svg.arc()
+    // .outerRadius(globals.pie.radius - 40)
+    // .innerRadius(globals.pie.radius - 40);
+//     
+   globals.statesPie.pie = d3.layout.pie()
+    .sort(function(d){return d.Value})
+    .value(function(d) { return d.Value; });
+      
+   d3.selectAll(".temporalSlider")
+      .on("change", function(){
+      	updateStatesPieChart();
+      });
+  
+  globals.statesPie.svg = d3.select("#stateChartHolder").append("svg")
+    .attr("width", globals.statesPie.width)
+    .attr("height", globals.statesPie.height)
+  .append("g")
+    .attr("transform", "translate(" + globals.statesPie.width / 2 + "," + globals.statesPie.height / 2 + ")");
+}
+
+
+
+function updateStatesPieChart(){
+	// //update the pie chart with new data  
+	console.log('pie update'); 
+	inputData = globals.filteredData
+	data = calculatePieChartComp(aggregateByState(inputData)) // this will have been updated by the event listeners  
+	globals.statesPie.svg.selectAll(".arc")
+		.remove()
+   globals.statesPie.path = globals.statesPie.svg.selectAll(".arc")
+      .data(globals.statesPie.pie(data))
+    .enter().append("g")
+      .attr("class", "arc")
+      .attr('type', function(d){
+      	return d.data.Category
+      })
+      .attr('dataValue', function(d){
+      	return d.data.Value
+      });
+      
+    globals.statesPie.path.append("path")
+      .attr("d", globals.pie.arc)
+      .style("fill", function(d) { 
+      	color = globals.statesPie.colorScale(d.data.Category)
+      	return color; });
+
+  // globals.pie.path.append("text")
+      // .attr("transform", function(d) { return "translate(" + globals.pie.labelArc.centroid(d) + ")"; })
+      // .attr("dy", ".35em")
+      // .text(function(d) { return d.data.Type; });
+   
+	 //here is the tooltip for this item
+	 globals.statesPie.tip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+
+
+ //event listeners
+	globals.statesPie.svg.call(globals.statesPie.tip)//enable the tooltip
+      
+ globals.statesPie.path.on('mouseover', function(){
+ 	var slice = d3.select(this);
+ 	slice.attr('stroke', 'white');
+ 	var disType = slice.attr('type');
+ 	var disVal = slice.attr('dataValue');
+ 	if (globals.currentTotal != 0){//catch div!/0 errors
+ 		var disPct = Math.round((disVal / globals.currentTotal) * 100); //percent of total
+ 	}
+ 	else{
+ 		var disPct = 0;
+ 	}
+ 	var txt = "<label>" + disType + ":  </label><span>" + disVal + "   </span><span class='text-muted'>(" + disPct + "%)</span>";
+ 	globals.statesPie.tip.html(txt);
+ 	globals.statesPie.tip.show()
+ });
+ globals.statesPie.path.on('mouseout', function(){
+ 	d3.select(this).attr('stroke', 'none') // clear the formatting
+ 	globals.statesPie.tip.hide()
+ });
+ 
+
+ 
+}
+
+
+
+//change normalization type in GUI
+$("input[name=normType]").on('change', function(){
+	globals.mapConfig.normType = $(this).val()
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
+});
+
 
 
 

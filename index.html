@@ -14,44 +14,96 @@
 		<meta name="viewport" content="width=device-width; initial-scale=1.0">
 		<!--Load my css files -->
 		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<link rel="stylesheet" href="assets/css/bootstrap.css">
 		
 		<!-- Optional theme -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+		<link rel="stylesheet" href="assets/css/bootstrap-theme.min.css">
 		<link rel="stylesheet" href="assets/css/style.css">
 	</head>
 
 	<body>
-		<div id='main' class='row'>
-			<div class='col-xs-4' id='filterControls'>
-				<h2 class='page-header'>FEMA Disaster Declarations</h2>
+		
+  <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">FEMA Multi-Hazard Information Tool</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class='active'><a href="../navbar/" >Map</a></li>
+            <li><a href="../navbar-static-top/">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    
+		<div id='main' class='col-sm-12 col-xs-12'>
+			<div class='col-sm-3 col-xs-12' id='filterControls'>
+				<h2 class='page-header'>
+					Filter by Disaster Type
+				</h2>
 				<div id='typeFilter'>
 					<select id='typeSelect'></select><br />
-					<label>Filter by Month</label><br/>
-					<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
-					<label>Filter by Year</label><br/>
-					<span>Min Year: </span><span id='minYearText'>1960</span><input type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
+				</div>
+				<h2 class='page-header'>
+					Filter by Year
+				</h2>
+				<div id='yearFilter'>
+					<div id='yearBarChart' class='temporalBar'></div>
+					<span>Min Year: </span><span id='minYearText'>1960</span><input class='temporalSlider' type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input class='temporalSlider' type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
+				</div>
+				<h2 id='monthFilter'>
+					Filter by Month
+				</h2>
+				<div id='monthFilter'>
+					<div id='monthBarChart' class='temporalBar'></div>
+					<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' class='temporalSlider' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input class='temporalSlider' type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
 				</div>
 				
-			</div>
-			<div class='col-xs-8' id='infoViz'></div>
-		</div>
-		<div id='status'>
-			<progress id='loadProgress' max="100"></progress> <br />
-			<div>Currently doing: <span id='currentTask'></span></div><br />
-			<div>Files loaded: <span id='filesLoaded'></span></div>
-			<div>Current Number of Disasters: <span id='currentNumDisasters'></span></div>
-			<div id='pieChart'></div>
-		</div>
-		
+			<h2>Data Normalization</h2>
+			<label>Raw</label><input name='normType' value='None' type='radio' checked/><br />
+			<label>Area (Disasters / km<sup>2</sup>)</label><input name='normType' value='Area' type='radio'/>
+			
+			<h2>Geography Type</h2>
+			<label>Counties</label><input name='geogType' value='Counties' type='radio' checked/><br />
+			<label>States</label><input name='geogType' value='States' type='radio'/>
+			</div> <!-- end filter controls-->
+			
+			<div class='col-sm-9 col-xs-12' id='infoViz'>
+				<div id='map'></div>
+				<div id='bottomBar' class='row'>
+					<div id='typeChartHolder' class='col-sm-6'>
+						<label>Type Breakdown</label>
+						<!--type pie chart goes here-->
+					</div>
+					<div id='stateChartHolder' class='col-sm-6'>
+						<!--states pie chart goes here-->
+						<label>State Breakdown</label>
+					</div>
+					
+				</div>
+			</div> <!-- this is the map-->
+			
+		</div> <!-- end main row-->
+	
 		
 	<!-- Load external javascript files-->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js'></script>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>	
+	<script src="assets/js/underscore.js"></script>
+	<script src='assets/js/date.js'></script>
+	<script src="assets/js/d3.min.js"></script>
+	<script src="assets/js/topojson.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script> <!--Tooltips-->
+	<script src='assets/js/app_utils.js'></script>
 	<script src='assets/js/main.js'></script>
 	</body>
 </html>
