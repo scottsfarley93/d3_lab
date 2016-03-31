@@ -1,10 +1,5 @@
 #filterControls{
-	background-color: black;
 	height: 100%;
-	max-height:100%;
-	min-height:100%;
-	color: white;
-	overflow:hidden;
 }
 html, body, #main, #filterControls{
 	height:100%;
@@ -19,8 +14,6 @@ html, body, #main, #filterControls{
 
 #filterControls{
 	top:25px;
-	padding-left: 2%;
-	padding-right: 2%;
 }
 
 #stateChartHolder{
@@ -28,19 +21,6 @@ html, body, #main, #filterControls{
 	top:0%;
 	text-align:center;
 	color: white;
-}
-
-.img-btn{
-	height: 100;
-	width: 100;
-}
-
-#summary{
-	height: 100%;
-	width: 200px;
-	z-index: 10;
-	position: relative;
-	
 }
 #map{
 	height: 80%;
@@ -112,4 +92,112 @@ html, body, #main, #filterControls{
   top: 100%;
   left: 0;
 }
+#disasterMenuButton{
+	width: 100%;
+}
 
+.dis-btn{
+	width:70px; 
+  	height:70px; 
+  	
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+			#btn1{
+	background: url("/assets/img/thumbs/coastal.svg") no-repeat center ; 
+}
+			#btn2{
+	background: url("/assets/img/thumbs/dam.svg") no-repeat center; 
+}
+			#btn3{
+	background: url("/assets/img/thumbs/drought.svg") no-repeat center; 
+}
+			#btn4{
+	background: url("/assets/img/thumbs/fire.svg") no-repeat center ; 
+}
+			#btn5{
+	background: url("/assets/img/thumbs/fish.svg") no-repeat center
+}
+			#btn6{
+	background: url("/assets/img/thumbs/flood.svg") no-repeat center
+}
+			#btn7{
+	background: url("/assets/img/thumbs/freezing.svg") no-repeat center
+}
+			#btn8{
+	background: url("/assets/img/thumbs/hurricane.svg") no-repeat center
+}
+			#btn9{
+	background: url("/assets/img/thumbs/human.svg") no-repeat center
+}
+			#btn10{
+	background: url("/assets/img/thumbs/ice.svg") no-repeat center
+}
+			#btn11{
+	background: url("/assets/img/thumbs/landslide.svg") no-repeat center
+}
+			#btn12{
+	background: url("/assets/img/thumbs/snow.svg") no-repeat center
+}
+			#btn13{
+	background: url("/assets/img/thumbs/storm.svg") no-repeat center
+}
+			#btn14{
+	background: url("/assets/img/thumbs/terrorist.svg") no-repeat center
+}
+			#btn15{
+	background: url("/assets/img/thumbs/tornado.svg") no-repeat center
+}
+			#btn16{
+	background: url("/assets/img/thumbs/toxic.svg") no-repeat center
+}
+			#btn17{
+	background: url("/assets/img/thumbs/tsunami.svg") no-repeat center
+} 
+			#btn18{
+	background: url("/assets/img/thumbs/typhoon.svg") no-repeat center
+}
+			#btn19{
+	background: url("/assets/img/thumbs/volcano.svg") no-repeat center
+}
+			#btn20{
+	background: url("/assets/img/thumbs/chemical.svg") no-repeat center
+}
+			#btn21{
+	background: url("/assets/img/thumbs/all.svg") no-repeat center
+}
+			#btn22{
+	background: url("/assets/img/thumbs/calculate.svg") no-repeat center
+}
+
+#disasterGrid div{
+	display: block;
+}
+.caption{
+	display: block;
+	text-align: center;
+	width: 100%;
+}
+.dis-btn{
+	width: 100%;
+}
+.dropdown-menu-right{
+	position: absolute;
+	background-color: rgba(225, 255, 255, 0.8);
+	border-radius: 25px;
+	box-shadow: 10px 10px;
+	left: 100%!important;
+	width: 125% !important;
+	top:-75px;
+	padding-right: 0px;
+	text-align: center;
+}
+#disasterGrid .row{
+	margin-right: 0px;
+	padding-right:0px;
+}
+.header{
+	color: white;
+}

@@ -175,7 +175,7 @@ function loadDisasterData(){
 				value['FIPSCode'] = checkFIPS(value.FIPSCode)
 			});
 			globals.filteredData = globals.data.fema;
-			
+			globals.totalData = globals.data.fema.length;
 			if (globals.filesLoaded == 4){
 				$(document).trigger('filesLoaded');
 			}
@@ -415,6 +415,7 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	globals.filteredData = filteredInput
 	//do other updates
 	displayMapTotal(filteredInput);
+	displayPercentTotal(filteredInput)
 	updateTypePieChart();
 	updateStatesPieChart();
 	updateBarCharts(filteredInput, globals.temporalFilter);
@@ -851,6 +852,29 @@ $("input[name=normType]").on('change', function(){
 	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
 });
 
+//click handlers for the disaster selection box
+$('.dis-btn').click(function(){
+	t = $(this).data('type');
+		if (t == "All Disasters"){
+			t = "All";
+		};
+		globals.currentTypeFilter = t; // set the filter
+		//filter
+		if (t != "All"){
+			newData = filterByType(globals.data.fema, t);
+		}else{
+			newData = globals.data.fema;
+		}
+		//apply any existing temporal filtering
+		newData = filterByTimeRange(newData, globals.temporalFilter);
+		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData);		
+		globals.filteredData = newData;
+		
+		//update the display
+		//convert to title case
+		t = t.substring(0,1).toUpperCase() + t.substring(1, t.length).toLowerCase();
+		$("#dis-title").text(t)
+});
 
 
 

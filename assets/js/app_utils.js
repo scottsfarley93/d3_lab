@@ -188,6 +188,13 @@ function displayMapTotal(input){
 	globals.currentTotal = l
 }
 
+function displayPercentTotal(input){
+	//show the percent of total currently being displayed
+	fract = globals.currentTotal / globals.totalData * 100;
+	show= Math.round(fract* 100) / 100 //do some rounding
+	$("#percentTotal").text(show + "%");
+}
+
 //NORMALIZATION controls
 function normalize(geographyType, normalizationType, inputObject){
 	//returns an array of data values with a {'State' : NormalizedCount} value pairs

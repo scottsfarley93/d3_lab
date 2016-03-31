@@ -47,12 +47,123 @@
     
 		<div id='main' class='col-sm-12 col-xs-12'>
 			<div class='col-sm-3 col-xs-12' id='filterControls'>
-				<h2 class='page-header'>
-					Filter by Disaster Type
+				<h2 class='page-header header col-xs-6' id='dis-title'>
+					All Disasters
+					
 				</h2>
-				<div id='typeFilter'>
-					<select id='typeSelect'></select><br />
+
+				<!--Diaster Icon Grid--->
+				  <div class="dropdown-menu dropdown-menu-right col-xs-offset-4 col-xs-2" aria-labelledby="dropdownMenu1">
+					<div class='row'>
+						<div id='icon1' class='col-xs-2'>
+							<button class='btn dis-btn' id='btn1' data-type='Coastal Storm'></button>
+							<label class='caption'>Coastal<br />Storm</label>
+						</div>
+						<div id='icon2 ' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn2' data-type='Dam/Levee Break'></button>
+							<label  class='caption'>Dam Failure</label>
+						</div>
+						<div id='icon3' class='col-xs-2' align="center">
+							<button class='btn  dis-btn' id='btn3' data-type='Drought'></button>
+							<label  class='caption'>Drought</label>
+						</div>
+						<div id='icon4' class='col-xs-2' align='center'>
+							<button class='btn  dis-btn' id='btn4' data-type='Fire'></button>
+							<label  class='caption'>Fire</label>
+						</div>
+					</div>
+					<div class='row'>
+						<div id='icon7' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn7' data-type='Freezing'></button>
+							<label  class='caption'>Freezing</label>
+						</div>
+						<div id='icon8' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn8' data-type='Hurricane'></button>
+							<label  class='caption'>Hurricane</label>
+						</div>
+						<div id='icon9' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn9' data-type='Human Cause'></button>
+							<label  class='caption'>Human Caused</label>
+						</div>
+						<div id='icon10' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn10' data-type='Severe Ice Storm'></button>
+							<label  class='caption'>Severe Ice Storm</label>
+						</div>
+					</div>
+					<div id='row3' class='row'>
+						<div id='icon13' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn13' data-type='Severe Storm(s)'></button>
+							<label  class='caption'>Severe Storm</label>
+						</div>
+						<div id='icon14' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn14' data-type='Terrorist'></button>
+							<label  class='caption'>Terrorist</label>
+						</div>
+						<div id='icon15' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn15' data-type='Tornado'></button>
+							<label  class='caption'>Tornado</label>
+						</div>
+						<div id='icon16' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn16' data-type='Toxic Substances'></button>
+							<label  class='caption'>Toxic Substances</label>
+						</div>
+						
+					</div>
+					<div class='row'>
+					<div id='icon19' class='col-xs-2'>
+						<button class='btn  dis-btn' id='btn19' data-type='Volcano'></button>
+						<label  class='caption'>Volcano</label>
+					</div>
+						<div id='icon20' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn20' data-type='Chemical'></button>
+							<label  class='caption'>Chemical Spill</label>
+						</div>
+						<div id='icon5' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn5' data-type='Fishing Losses'></button>
+							<label  class='caption'>Fishing Losses</label>
+						</div>
+						<div id='icon6' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn6' data-type='Flood'></button>
+							<label  class='caption'>Flood</label>
+						</div>
+					</div>
+					<div class='row'>
+						<div id='icon17' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn17' data-type='Tsunami'></button>
+							<label  class='caption'>Tsunami</label>
+						</div>
+						<div id='icon18' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn18' data-type='Typhoon'></button>
+							<label  class='caption'>Typhoon</label>
+						</div>		
+						<div id='icon11' class='col-xs-2' data-type='Landslide/Mudslide'>
+							<button class='btn  dis-btn'  id='btn11'></button>
+							<label  class='caption'>Landslide</label>
+						</div>
+						<div id='icon12' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn12' data-type='Nsow'></button>
+							<label  class='caption'>Snow</label>
+						</div>	
+					</div>
+					<hr />
+					<div class='row'>
+						<div id='allIcon' class='col-xs-2 col-xs-offset-2'>
+							<button class='btn  dis-btn' id='btn21' data-type='All Disasters'></button>
+							<label class='caption'>All<br />Disasters</label>
+						</div> 
+						<div id='compIcon' class='col-xs-2'>
+							<button class='btn  dis-btn' id='btn22' data-type='Composite'></button>
+							<label class='caption'>Calculate<br />Composite</label>
+						</div> 
+					</div>
+				  </div>
 				</div>
+				
+				<label>Historic Total: </label><span class='text-muted' id='currentNumDisasters'></span><br />
+				<label>Percent of Total: </label><span class='text-muted' id='percentTotal'></span><br />
+				
+				
+				
 				<h2 class='page-header'>
 					Filter by Year
 				</h2>
