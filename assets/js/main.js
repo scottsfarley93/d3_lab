@@ -54,7 +54,6 @@ globals.mapConfig.inputData = []
 $(document).ready(function(){
 	//use this to make sure that all files have been loaded into the platform
 	$(document).bind('filesLoaded', function(){
-		console.log("Bind function run");
 		loadPlatform();
 	});
 	loadData();
@@ -91,7 +90,6 @@ function populateTypeSelect(){
 			optionText = "All";
 		};
 		globals.currentTypeFilter = optionText; // set the filter
-		console.log(optionText);
 		//filter
 		if (optionText != "All"){
 			newData = filterByType(globals.data.fema, optionText);
@@ -111,7 +109,6 @@ function configureTimeFilter(){
 	//event handler for min and max month sliders
 	//and for min and max year sliders
 	//called when one of the sliders changes
-	console.log("Got to configureTime")
 	//get the values of all of the sliders
 	globals.temporalFilter.minMonth = $("#monthSliderMin").val();
 	globals.temporalFilter.maxMonth = $("#monthSliderMax").val();
@@ -163,11 +160,7 @@ function loadDisasterData(){
 	//loads the raw fema data from the server disk
 	$.ajax("assets/data/fema4.json",{
 		dataType:"json",
-		beforeSend: function(){
-			console.log("Loading fema data.");
-		},
 		success: function(response){
-			console.log("Done loading fema data.");
 			globals.filesLoaded += 1;
 			$("#filesLoaded").text(globals.filesLoaded);
 			globals.data.fema = response['data']; //this is the raw response in case we fuck up later and don't want to load it again
@@ -190,9 +183,6 @@ function loadCountyData(){
 	//loads the county level metadata for normalization from the server disk
 	$.ajax("assets/data/county_data.json", {
 		dataType:'json',
-		beforeSend: function(){
-			console.log("Loading county level metadata.");
-		},
 		success: function(response){
 			console.log("Loaded county metadata.");
 			globals.filesLoaded += 1;
@@ -211,11 +201,7 @@ function loadStateData(){
 	//loads the state level metadata for normalization from the server disk
 		$.ajax("assets/data/state_data.json", {
 		dataType:'json',
-		beforeSend: function(){
-			console.log("Loading state level metadata.");
-		},
 		success: function(response){
-			console.log("Loaded state metadata.");
 			globals.filesLoaded += 1;
 			$("#filesLoaded").text(globals.filesLoaded);
 			globals.data.stateMetadata = response;
@@ -233,9 +219,6 @@ function loadMapData(){
 	$.ajax("assets/data/counties_mbostock.topojson", {
 		dataType:'json',
 		data:{},
-		beforeSend: function(){
-			console.log("Loading state level metadata.");
-		},
 		success: function(response){
 			console.log("Loaded state metadata.");
 			globals.filesLoaded += 1;
@@ -248,9 +231,6 @@ function loadMapData(){
 		},
 		error: function(xhr, status, error){
 			console.log(error);
-		},
-		beforeSend: function(){
-			console.log(this.url);
 		}
 	});	 
 }
@@ -264,7 +244,6 @@ function createMap(){
 	//set props
 	var width = $("#map").width(),
     height = $("#map").height();
-    console.log(height + "x" + width)
 	
 	//get projection ready
 	var projection = d3.geo.albersUsa()
@@ -298,8 +277,11 @@ function createMap(){
       .datum(topojson.mesh(globals.data.mapData, globals.data.mapData.objects.states, function(a, b) { return a !== b; }))
       .attr("class", "states")
       .attr("d", path)
-      .style('stroke', 'red')
-      .style('fill', 'none');
+      .style('fill', 'none')
+      .style('stroke', 'black');
+      
+      
+
      
      globals.map.counties.on('click', function(){
      	thisFips = d3.select(this).attr('FIPS');
@@ -310,25 +292,38 @@ function createMap(){
      ///TODO:Additional map events should go here
 }
 
+
+function createColorScale(data){
+	    var colorClasses = [ // the colors
+        "#ffffff",
+        "#c1a19c",
+        "#a2726b",
+        "#83423a",
+        "#651409"
+    ];
+	    //quantiles scale
+	    var colorScale = d3.scale.quantile()
+	        .range(colorClasses);
+	
+	    //build array of all values of the expressed attribute
+	    var domainArray = [];
+	    for (var i=0; i<data.length; i++){
+	        var val = parseFloat(data[i].value);
+	        domainArray.push(val);
+	    };
+	
+	    //assign array of expressed values as scale domain
+	    colorScale.domain(domainArray);
+	
+	    return colorScale;
+}
+
 function updateMap(geographyType, normalizationType, filteredInput){
 	//accepts a geography type of 'Counties' or 'States' and an array of input filtered in the desired way
 	//accepts a normalization type of 'Pop', 'Area', or 'None'
 	//function aggreages to the desired geography and then sets the choropleth colors
 	//returns nothing
-		//this deals with the colors
-	
 	//different breakpoints on the color scale
-	console.log("Geography Type: " + geographyType);
-	console.log("Normalization Type: " + normalizationType);
-	if (normalizationType == "None"){
-			globals.map.colorScale = d3.scale.threshold() //map values to colors
-        .domain([ 0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 100, 200])
-	}else if (normalizationType== "Area"){
-			globals.map.colorScale = d3.scale.threshold() //map values to colors
-        .domain([0.00001, 0.00010, 0.00025, 0.00040, 0.00050, 0.0007500, 0.00100, 0.005, 0.01, 0.025, 0.05, 1])
-	}
-	globals.map.colorScale
-    	.range(['white', 'white', '#e3b3b3', '#d58d8d', '#c76666', '#ba4141', '#a73a3a', '#822d2d', '#6f2727', '#5d2020', '#4a1a1a', '#371313', '#250d0d', 'black']);
 	//States isn't working yet
 	 if(geographyType == 'Counties'){
 		toMap = aggregateByCounty(filteredInput);
@@ -339,27 +334,29 @@ function updateMap(geographyType, normalizationType, filteredInput){
 			toMap = normalize("Counties", "None", toMap);
 		}
 		idToValueMap = {};
+		
+		globals.map.colorScale = createColorScale(toMap);
 		//populate the id/value lookup
 	    _.each(toMap, function(d){
 	    	idToValueMap[checkFIPS(d.geography).toString()] = {value: +d.value, geography: checkFIPS(d.geography)};});
+	    globals.map.idToValueMap = idToValueMap;
 	    allIDS = [];
 	    globals.map.counties.style('fill', function(d){
 	    	thisID = checkFIPS(d3.select(this).attr('FIPS'));
 	    	allIDS.push(thisID);
 			lookup = idToValueMap[thisID];
-			globals.map.idToValueMap = idToValueMap
 			//if it is not in idToValueMap, then it means that the filtered value is zero (no disasters);
 			//lookup will be undefined
 			//so you a try catch block and set value to zero
 			try{
 				thisValue = idToValueMap[thisID].value;
-				
 			}catch (err){
 				thisValue = 0;
 			}
 			if (thisValue == -1){
 				return 'gray';
 			}else if (thisValue >= 0){
+				c = globals.map.colorScale(thisValue);
 				return globals.map.colorScale(thisValue);
 			}
 	   });
@@ -373,13 +370,11 @@ function updateMap(geographyType, normalizationType, filteredInput){
 			//so you a try catch block and set value to zero
 			thisValue = globals.map.idToValueMap[thisID];
 			if (thisValue){
-				thisValue = thisValue.value
+				thisValue = thisValue.value;
 			}else{
 				thisValue = 0;
 			}
-			console.log(thisValue);
 			detailList = _.where(filteredInput, {FIPSCode:thisID});
-			console.log(detailList);
 	   });
 	   
 	   	//tooltips //TODO: Change to popup overlay
@@ -457,7 +452,6 @@ function buildTypePieChart(data){
 
 function updateTypePieChart(){
 	// //update the pie chart with new data  
-	console.log('pie update'); 
 	inputData = globals.filteredData
 	data = calculatePieChartComp(aggregateByType(inputData)) // this will have been updated by the event listeners  
 	globals.pie.svg.selectAll(".arc")
@@ -510,7 +504,12 @@ function updateTypePieChart(){
  });
  globals.pie.path.on('mouseout', function(){
  	d3.select(this).attr('stroke', 'none') // clear the formatting
- 	globals.pie.tip.hide()
+ 	globals.pie.tip.hide();
+ });
+ globals.pie.path.on('click', function(){
+ 	 	globals.pie.tip.hide();
+ 	type = d3.select(this).attr('type');
+ 	setType(type);
  });
  
 
@@ -560,7 +559,6 @@ function buildBarCharts(){
 	    .ticks(10);
 	
 	globals.barcharts.monthX.domain(monthData.map(function(d) { 
-		console.log(d.month)
 		return d.month.toString(); }));
   	globals.barcharts.monthY.domain([0, d3.max(monthData, function(d) {
   		 return +d.value; })]);
@@ -665,7 +663,6 @@ function updateBarCharts(data, temporalFilter){
 		value: +value.length}
 	})
 	var yearAgg = aggregateByYear(data)
-	console.log(yearAgg)
 	var yearData = _.map(yearAgg, function(value, key){
 		return {year: key,
 		value: +value.length}
@@ -749,7 +746,6 @@ $(window).resize(function(){
 
 //build the pie chart showing composition
 function buildStatesPieChart(data){
-	console.log("Built states pie chart.")
 	//build the chart
 	globals.statesPie.height = $("#stateChartHolder").height();
 	globals.statesPie.width = $("#stateChartHolder").width();
@@ -784,7 +780,6 @@ function buildStatesPieChart(data){
 
 function updateStatesPieChart(){
 	// //update the pie chart with new data  
-	console.log('pie update'); 
 	inputData = globals.filteredData
 	data = calculatePieChartComp(aggregateByState(inputData)) // this will have been updated by the event listeners  
 	globals.statesPie.svg.selectAll(".arc")
@@ -855,6 +850,10 @@ $("input[name=normType]").on('change', function(){
 //click handlers for the disaster selection box
 $('.dis-btn').click(function(){
 	t = $(this).data('type');
+	setType(t);
+});
+
+function setType(t){
 		if (t == "All Disasters"){
 			t = "All";
 		};
@@ -874,7 +873,5 @@ $('.dis-btn').click(function(){
 		//convert to title case
 		t = t.substring(0,1).toUpperCase() + t.substring(1, t.length).toLowerCase();
 		$("#dis-title").text(t)
-});
-
-
+}
 

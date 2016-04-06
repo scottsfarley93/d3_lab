@@ -201,3 +201,10 @@ html, body, #main, #filterControls{
 .header{
 	color: white;
 }
+#dropdownMenu1{
+	height: 50px;
+}
+#filter-img{
+	height: 50px;
+	width: 50px;
+}
