@@ -28,13 +28,6 @@ html, body, #main, #filterControls{
 	margin: 0%;
 	padding:5%;
 }
-#bottomBar{
-	height: 20%;
-	background-color: black;
-	bottom: 0%
-	margin:0%;
-	padding: 0%;
-}
 
 #infoViz{
 	height:100%;
@@ -95,10 +88,12 @@ html, body, #main, #filterControls{
 #disasterMenuButton{
 	width: 100%;
 }
+#type-filter-container{
+	background-color: white;
+}
 
 .dis-btn{
-	width:70px; 
-  	height:70px; 
+  	height:50px; 
   	
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -179,27 +174,26 @@ html, body, #main, #filterControls{
 	display: block;
 	text-align: center;
 	width: 100%;
+	padding-top: 0%;
 }
 .dis-btn{
 	width: 100%;
 }
-.dropdown-menu-right{
-	position: absolute;
-	background-color: rgba(225, 255, 255, 0.8);
+
+#disaster-grid{
 	border-radius: 25px;
-	box-shadow: 10px 10px;
-	left: 100%!important;
-	width: 125% !important;
-	top:-75px;
-	padding-right: 0px;
-	text-align: center;
+
 }
-#disasterGrid .row{
+
+#disaster-grid .row{
 	margin-right: 0px;
 	padding-right:0px;
 }
 .header{
 	color: white;
+}
+#bars{
+	height: 100%;
 }
 #dropdownMenu1{
 	height: 50px;
@@ -207,4 +201,74 @@ html, body, #main, #filterControls{
 #filter-img{
 	height: 50px;
 	width: 50px;
+}
+#filter-bar{
+	height: 75%;
+	padding: 0px;
+	border-radius: 5px;
+	max-height: 75%;
+	background-color: black;
+}
+.menu-icon{
+	height: 30%;
+	padding: 0px;
+	margin:0px;
+	opacity: 0.25;
+	z-index:21;
+	box-shadow:10px 10px 5px rgba(0, 0, 0, 0.85); 
+}
+.filter-button{
+	height:100%;
+	width: 100%;
+}
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12{
+	padding: 0px;
+}
+#extra-bar{
+	z-index: 10;
+	position: relative;
+	box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.85);
+	height: 100%;
+	background-color: rgba(255, 255, 255, 0.5);
+}
+#main{
+	position: absolute;
+}
+#close-extra{
+	right: 0px;
+}
+#map-window{
+	height: 100%;
+	background-color: lightsteelblue;
+}
+
+#header-info{
+	position: absolute;
+	top: 1%;
+	right: 1%;
+	z-index: 10;
+	text-align: right;
+}
+.page-header{
+	color: white;
+	text-align: center;
+}
+.filter-icon{
+	margin-bottom: 5%;
+}
+
+.header{
+	color: white;
+	text-align: center;
+}
+.temporal-filter-holder{
+	height: 100%;
+	padding-left: 10%;
+}
+.help-p{
+	padding: 5%;
+}
+#extra-bar{
+	max-height: 100%;
+	overflow: auto;
 }

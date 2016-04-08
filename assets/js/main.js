@@ -129,11 +129,7 @@ function configureTimeFilter(){
 	globals.filteredData = newData;
 }
 
-//event listeners for the temporal filters
-$("#monthSliderMin").change(configureTimeFilter);
-$("#monthSliderMax").change(configureTimeFilter);
-$("#yearSliderMin").change(configureTimeFilter);
-$("#yearSliderMax").change(configureTimeFilter);
+
 
 function loadData(){
 	$("#currentTask").text("Loading external data files.");
@@ -250,8 +246,8 @@ function loadMapData(){
 function createMap(){
 	//draws a blank map
 	//set props
-	var width = $("#map").width(),
-    height = $("#map").height();
+	var width = $("#map-window").width(),
+    height = $("#map-window").height();
 	
 	//get projection ready
 	var projection = d3.geo.albersUsa()
@@ -261,7 +257,7 @@ function createMap(){
 	var path = d3.geo.path()
 	    .projection(projection);
 	
-	globals.map.map = svg = d3.select("#map").append("svg")
+	globals.map.map = svg = d3.select("#map-window").append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
 	//make globals
@@ -831,47 +827,16 @@ function updateBarCharts(data, temporalFilter){
 	  .html(function(d){
 	  	return "<label>" + d.year + "</label><span class='text-muted'>" + d.value + "</span>"
 	  });
- //event listeners
 }
 
-/// Handle window resize
-function onResize(){
-	//on document resize
-	clearMap();
-	createMap();
-	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);	
-}
-$(window).resize(function(){
-	onResize();
-});
+// $(window).resize(function(){
+	// onResize();
+// });
 
 
-
-
-
-
-
-
-//change normalization type in GUI
-$("input[name=normType]").on('change', function(){
-	globals.mapConfig.normType = $(this).val()
-	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
-});
-
-//change geog type in GUI
-$("input[name=geogType]").on('change', function(){
-	console.log("Changed geography to " + $(this).val());
-	globals.mapConfig.geogType = $(this).val()
-	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
-});
-
-//click handlers for the disaster selection box
-$('.dis-btn').click(function(){
-	t = $(this).data('type');
-	setType(t);
-});
 
 function setType(t){
+	//updates the interface to show a particular type of disaster
 		if (t == "All Disasters"){
 			t = "All";
 		};

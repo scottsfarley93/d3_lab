@@ -23,211 +23,212 @@
 
 	<body>
 		
-
-    
-		<div id='main' class='col-sm-12 col-xs-12'>
-			<div class='col-sm-3 col-xs-12' id='filterControls'>
-							<h2 class='page-header header col-xs-12' id='dis-title'>
-					All Disasters
-				</h2> 
-			<div class="dropdown">
-		  <button class="btn btn-default dropdown-toggle btn-lrg col-xs-12" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-		    <label>Filter</label><img id='filter-img' src="assets/img/thumbs/filter.svg"/>
-		  </button>
-				<!--Diaster Icon Grid--->
-				  <div class="dropdown-menu dropdown-menu-right col-xs-offset-4 col-xs-2" aria-labelledby="dropdownMenu1">
+		
+		<div id='main' class='col-xs-12'>
+			<div id='bars' class='col-xs-1'>
+			<div id='filter-bar' class='col-xs-6'>
+				<div id='type-filter-icon' class='menu-icon'>
+					<button id='type-filter-button' class='filter-button' data-clicked='false'>
+						<img src='assets/img/thumbs/all.svg'/>
+						<label class='caption filter-caption' id='type-caption'>
+							Filter by Disaster Type
+						</label>
+					</button>
+				</div>
+				<div id='time-filter-icon' class='menu-icon'>
+					<button id='time-filter-button' class='filter-button' data-clicked='false'>
+						<img src='assets/img/thumbs/time.svg'/>
+						<label class='caption filter-caption' id='temporal-caption'>
+							Filter by Temporal Range
+						</label>
+					</button>
+				</div>
+				<div id='pie-filter-icon' class='menu-icon'>
+					<button id='pie-filter-button' class='filter-button' data-clicked='false'>
+						<img src='assets/img/thumbs/pie.svg'/>
+						<label class='caption filter-caption' id='breakdown-caption'>
+							Show Breakdown
+						</label>						
+					</button>
+				</div>				
+				<div id='settings-filter-icon' class='menu-icon'>
+					<button id='settings-filter-button' class='filter-button' data-clicked='false'>
+						<img src='assets/img/thumbs/settings.svg'/>
+						<label class='caption filter-caption' id='breakdown-caption'>
+							Map Settings
+						</label>						
+					</button>
+				</div>
+				<div id='help-filter-icon' class='menu-icon'>
+					<button id='help-filter-button' class='filter-button' data-clicked='false'>
+						<img src='assets/img/thumbs/help.svg'/>
+						<label class='caption filter-caption' id='help-caption'>
+							Show Application Help
+						</label>
+					</button>
+				</div>
+			</div><!--End filter bar-->
+			</div>
+			<div id='extra-bar' class='col-xs-4'>
+				<!-- extra information goes here-->
+				<h2 class='page-header' id='filter-header'>Filter Header</h2>
+				<div class='col-xs-11' id='disaster-grid'>
 					<div class='row'>
-						<div id='icon1' class='col-xs-2'>
+						<div id='icon1' class='col-xs-3 filter-icon'>
 							<button class='btn dis-btn' id='btn1' data-type='Coastal Storm'></button>
 							<label class='caption'>Coastal<br />Storm</label>
 						</div>
-						<div id='icon2 ' class='col-xs-2'>
+						<div id='icon2 ' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn2' data-type='Dam/Levee Break'></button>
 							<label  class='caption'>Dam Failure</label>
 						</div>
-						<div id='icon3' class='col-xs-2' align="center">
+						<div id='icon3' class='col-xs-3 filter-icon' align="center">
 							<button class='btn  dis-btn' id='btn3' data-type='Drought'></button>
 							<label  class='caption'>Drought</label>
 						</div>
-						<div id='icon4' class='col-xs-2' align='center'>
+						<div id='icon4' class='col-xs-3 filter-icon' align='center'>
 							<button class='btn  dis-btn' id='btn4' data-type='Fire'></button>
 							<label  class='caption'>Fire</label>
 						</div>
 					</div>
 					<div class='row'>
-						<div id='icon7' class='col-xs-2'>
+						<div id='icon7' class='col-xs-3 filter-icon '>
 							<button class='btn  dis-btn' id='btn7' data-type='Freezing'></button>
 							<label  class='caption'>Freezing</label>
 						</div>
-						<div id='icon8' class='col-xs-2'>
+						<div id='icon8' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn8' data-type='Hurricane'></button>
 							<label  class='caption'>Hurricane</label>
 						</div>
-						<div id='icon9' class='col-xs-2'>
+						<div id='icon9' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn9' data-type='Human Cause'></button>
 							<label  class='caption'>Human Caused</label>
 						</div>
-						<div id='icon10' class='col-xs-2'>
+						<div id='icon10' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn10' data-type='Severe Ice Storm'></button>
 							<label  class='caption'>Severe Ice Storm</label>
 						</div>
 					</div>
 					<div id='row3' class='row'>
-						<div id='icon13' class='col-xs-2'>
+						<div id='icon13' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn13' data-type='Severe Storm(s)'></button>
 							<label  class='caption'>Severe Storm</label>
 						</div>
-						<div id='icon14' class='col-xs-2'>
+						<div id='icon14' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn14' data-type='Terrorist'></button>
 							<label  class='caption'>Terrorist</label>
 						</div>
-						<div id='icon15' class='col-xs-2'>
+						<div id='icon15' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn15' data-type='Tornado'></button>
 							<label  class='caption'>Tornado</label>
 						</div>
-						<div id='icon16' class='col-xs-2'>
+						<div id='icon16' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn16' data-type='Toxic Substances'></button>
 							<label  class='caption'>Toxic Substances</label>
 						</div>
 						
 					</div>
 					<div class='row'>
-					<div id='icon19' class='col-xs-2'>
+					<div id='icon19' class='col-xs-3 filter-icon'>
 						<button class='btn  dis-btn' id='btn19' data-type='Volcano'></button>
 						<label  class='caption'>Volcano</label>
 					</div>
-						<div id='icon20' class='col-xs-2'>
+						<div id='icon20' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn20' data-type='Chemical'></button>
 							<label  class='caption'>Chemical Spill</label>
 						</div>
-						<div id='icon5' class='col-xs-2'>
+						<div id='icon5' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn5' data-type='Fishing Losses'></button>
 							<label  class='caption'>Fishing Losses</label>
 						</div>
-						<div id='icon6' class='col-xs-2'>
+						<div id='icon6' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn6' data-type='Flood'></button>
 							<label  class='caption'>Flood</label>
 						</div>
 					</div>
 					<div class='row'>
-						<div id='icon17' class='col-xs-2'>
+						<div id='icon17' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn17' data-type='Tsunami'></button>
 							<label  class='caption'>Tsunami</label>
 						</div>
-						<div id='icon18' class='col-xs-2'>
+						<div id='icon18' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn18' data-type='Typhoon'></button>
 							<label  class='caption'>Typhoon</label>
 						</div>		
-						<div id='icon11' class='col-xs-2' data-type='Landslide/Mudslide'>
+						<div id='icon11' class='col-xs-3 filter-icon' data-type='Landslide/Mudslide'>
 							<button class='btn  dis-btn'  id='btn11'></button>
 							<label  class='caption'>Landslide</label>
 						</div>
-						<div id='icon12' class='col-xs-2'>
+						<div id='icon12' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn12' data-type='Nsow'></button>
 							<label  class='caption'>Snow</label>
 						</div>	
 					</div>
 					<hr />
 					<div class='row'>
-						<div id='allIcon' class='col-xs-2 col-xs-offset-2'>
+						<div id='allIcon' class='col-xs-4 col-xs-offset-4 filter-icon'>
 							<button class='btn  dis-btn' id='btn21' data-type='All Disasters'></button>
 							<label class='caption'>All<br />Disasters</label>
 						</div> 
-						<div id='compIcon' class='col-xs-2'>
-							<button class='btn  dis-btn' id='btn22' data-type='Composite'></button>
-							<label class='caption'>Calculate<br />Composite</label>
-						</div> 
 					</div>
+				</div><!--end dis grid-->
+				<div class='col-xs-11' id='temporal-filters'>
+					<div id='year-filter-holder' class='temporal-filter-holder'>
+					<h4 class='header'>
+						Filter by Year
+					</h2>
+					<div id='yearFilter'>
+						<div id='yearBarChart' class='temporalBar'></div>
+						<span>Min Year: </span><span id='minYearText'>1960</span><input class='temporalSlider' type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input class='temporalSlider' type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
+					</div>
+				</div>
+				<div id='month-filter-holder' class='temporal-filter-holder'>
+					<h4 id='monthFilter' class='header'>
+						Filter by Month
+					</h2>
+					<div id='monthFilter'>
+						<div id='monthBarChart' class='temporalBar'></div>
+						<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' class='temporalSlider' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input class='temporalSlider' type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
+					</div>
+					<button id='exit-temporal-filter' class='btn btn-default'>Apply</button>
+				</div>
+				
+				</div><!--end temporal filters-->
+				<div id='breakdown'>
+					
+				</div>
+				<div id='help'>
+					<p class='help-p'>
+						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					</p>
+					<p class='help-p'>
+						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					</p>
+					<p class='help-p'>
+						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					</p>
+					<p class='help-p'>
+						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					</p>
+				</div>
+			</div> <!--end extra bar-->
+				  
+				  <div id='map-window' class='col-xs-11'>
+				  	
 				  </div>
-				</div>
-				
-				<label>Historic Total: </label><span class='text-muted' id='currentNumDisasters'></span><br />
-				<label>Percent of Total: </label><span class='text-muted' id='percentTotal'></span><br />
-				
-				
-				
-				<h2 class='page-header'>
-					Filter by Year
-				</h2>
-				<div id='yearFilter'>
-					<div id='yearBarChart' class='temporalBar'></div>
-					<span>Min Year: </span><span id='minYearText'>1960</span><input class='temporalSlider' type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input class='temporalSlider' type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
-				</div>
-				<h2 id='monthFilter'>
-					Filter by Month
-				</h2>
-				<div id='monthFilter'>
-					<div id='monthBarChart' class='temporalBar'></div>
-					<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' class='temporalSlider' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input class='temporalSlider' type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
-				</div>
-				
-			<h2>Data Normalization</h2>
-			<label>Raw</label><input name='normType' value='None' type='radio' checked/><br />
-			<label>Area (Disasters / km<sup>2</sup>)</label><input name='normType' value='Area' type='radio'/>
 			
-			<h2>Geography Type</h2>
-			<label>Counties</label><input name='geogType' value='Counties' type='radio' checked/><br />
-			<label>States</label><input name='geogType' value='States' type='radio'/>
-		
-			</div> <!-- end filter controls-->
 			
-			<div class='col-sm-9 col-xs-12' id='infoViz'>
-				<div id='map'></div>
-				<div id='bottomBar' class='row'>
-					<div id='typeChartHolder' class='col-sm-6'>
-						<label>Type Breakdown</label>
-						<!--type pie chart goes here-->
-					</div>
-				</div>
-			</div> <!-- this is the map-->
 			
-		</div> <!-- end main row-->
-		
-		
-		
-		<!--- MODALS -->
-		<!-- INFORMATION OPEN ON INIT AND ON ABOUT CLICK -->
-				<!-- Modal -->
-		<div id="startModal" class="modal fade" role="dialog">
-		  <div class="modal-dialog modal-lg">
-		
-		    <!-- Modal content-->
-		    <div class="modal-content">
+		<div id='header-info'>
+					<h3 class='page-header'>All Disasters</h3>
+					<label>Years: </label><span class='text-muted' id='yearRange'></span><br />
+					<label>Months: </label><span class='text-muted' id='monthRange'></span><br />
+					<label>Historic Total: </label><span class='text-muted' id='currentNumDisasters'></span><br />
+					<label>Percent of Total: </label><span class='text-muted' id='percentTotal'></span><br />
+	</div> <!--end of header-->
 
-		      <div class="modal-body"> <button type="button" class="close" data-dismiss="modal">&times;</button>
-		      	<p align='center'>text goes here</p>
-      </div>
-      <hr />
-      <div id='footerRow'>
-   		     <h5>Design and Implementation</h5> <br />
-		     <span class='text-muted'>Scott Farley | <a href='http://scottsfarley.com'>scottsfarley.com</a></span>
-	</div>
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
-		
-		  </div>
-		</div>
-		
-		<!-- Create a new composite -->
-		<!-- Modal -->
-		<div id="startModal" class="modal fade" role="dialog">
-		  <div class="modal-dialog modal-lg">
-		
-		    <!-- Modal content-->
-		    <div class="modal-content">
-
-		      <div class="modal-body" id='composite-modal'> <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <hr />
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
-		
-		  </div>
-		</div>
+    
+			
 	
 		
 	<!-- Load external javascript files-->
@@ -240,5 +241,6 @@
 	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script> <!--Tooltips-->
 	<script src='assets/js/app_utils.js'></script>
 	<script src='assets/js/main.js'></script>
+	<script src='assets/js/nav.js'></script>
 	</body>
 </html>

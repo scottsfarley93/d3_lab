@@ -321,3 +321,11 @@ function normalize(geographyType, normalizationType, inputObject){
 function clearMap(){
 	$("#map").empty();
 }
+
+/// Handle window resize
+function onResize(){
+	//on document resize
+	clearMap();
+	createMap();
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);	
+}
