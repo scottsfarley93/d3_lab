@@ -39,12 +39,33 @@ function getAllDisasterTypes(inputData){
 }
 
 function checkFIPS(fips){
-	//adds a preceeding zero if the given fips is only four digits long, otherwise returns the input fips
+	//fixes a fips number for use in linking the chorpleth data
 	fips = fips.toString();
+	//adds a preceeding zero if the given fips is only four digits long, otherwise returns the input fips
 	if (fips.length == 4){
-		fips = "0" + fips
+		fips = "0" + fips;
+	}
+	if (fips.length == 2){
+		fips = "0" + fips;
 	}
 	return fips;
+}
+function fixPostalCode(code){
+	//returns a two letter abbreviation from a string in the format 'US01'
+	s = code.replace("US", "");
+	if (s.substr(0, 1) == "0"){
+		s = s.replace("0", "");
+	}
+	ab = _.filter(globals.data.stateMetadata, {
+		FIPS : s
+	});
+	item = ab[0];
+	try {
+		return item['state'];
+	}catch(err){
+		return "";
+	}
+	
 }
 
 
@@ -244,8 +265,55 @@ function normalize(geographyType, normalizationType, inputObject){
 			});
 			return n
 		}
-	}else if(geographyType == "States"){
-		
+	}
+	else if(geographyType == "States"){
+		//join by two letter postal code
+		if (normalizationType == "None"){
+				keys = _.keys(globals.data.stateMetadata, function(d){
+					return d.FIPS
+				});
+				n = _.map(inputObject, function(value, key){
+					numDis = value.length;
+					geog = key.toString(); //postal code
+					i = keys.indexOf(geog);
+					out = {};
+					out['geography'] = geog;
+					out['normType'] = "None";
+					if (i == -1){
+						out['value'] = -1;
+					}else{
+						out['value'] = numDis;
+					}
+					return out;
+				});
+			return n;
+		}else if (normalizationType == "Area"){//normalize by land area
+			keys = _.keys(globals.data.stateMetadata, function(d){
+				return d.FIPS
+			});
+			n = _.map(inputObject, function(value, key){
+				numDis = value.length;
+				out = {};
+				geog = key; //postal code
+				out['geography'] = geog;
+				out['normtype'] = "Area";
+				if (keys.indexOf(geog) != -1){
+					details = getStateDetails(geog);
+					landarea = details['Area'];
+					if ((landarea !=0) && (landarea)){//prevent div/!0 errors
+						normed = +numDis / +landarea // disasters per km2
+					}else{
+						normed = -1;
+					}
+				}else{
+					normed = -1;
+				}
+
+				out['value'] = normed;
+				return out
+			});
+			return n
+		}
 	}
 
 }

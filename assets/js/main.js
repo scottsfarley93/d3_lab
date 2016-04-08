@@ -9,19 +9,15 @@
 
 //TODO:
 //automatic scale calculation
-//normalize on States
-//display states
-//pie chart for states
-//bar chart for months
-//bar chart for years
 //popup over map
+//styling
 
 
 var globals = {};
 globals.data = {};
 globals.disasterTypes = []; // a list of all of the types of disasters contained within the dataset
 globals.filesLoaded = 0; // keeps track of how many ajax files have been loaded to this point in the session.
-
+globals.requiredFiles = 5;
 
 globals.activeData = []; // this is the raw fema data 
 globals.currentTypeFilter = "All"; //keeps track of any type filter that has been applied;
@@ -42,7 +38,6 @@ globals.temporalFilter = {
 }; //this is the current filter on years and months
 
 globals.pie = {};//pie chart stuff
-globals.statesPie = {} //states pie chart stuff
 globals.currentTotal = 0; //total number of disasters with current filters;
 globals.mapConfig = {};
 globals.mapConfig.geogType = 'Counties';
@@ -66,7 +61,6 @@ function loadPlatform(){
 	 populateTypeSelect(); //creates the type selection dropdown menu
 	 createMap(); // creates the map
 	 buildTypePieChart(calculatePieChartComp(aggregateByType(globals.data.fema))); //builds a pie chart of the composition by type
-	 buildStatesPieChart(calculatePieChartComp(aggregateByState(globals.data.fema)));//builds a pie chart of the composition by states
 	 //set up the map with the default config
 	 globals.mapConfig.inputData = globals.data.fema;
 	 buildBarCharts();//these are the filter charts
@@ -169,7 +163,7 @@ function loadDisasterData(){
 			});
 			globals.filteredData = globals.data.fema;
 			globals.totalData = globals.data.fema.length;
-			if (globals.filesLoaded == 4){
+			if (globals.filesLoaded == globals.requiredFiles){
 				$(document).trigger('filesLoaded');
 			}
 		},
@@ -188,7 +182,7 @@ function loadCountyData(){
 			globals.filesLoaded += 1;
 			$("#filesLoaded").text(globals.filesLoaded);
 			globals.data.countyMetadata = response;
-			if (globals.filesLoaded == 4){
+			if (globals.filesLoaded == globals.requiredFiles){
 				$(document).trigger('filesLoaded');
 			}
 		},
@@ -205,7 +199,7 @@ function loadStateData(){
 			globals.filesLoaded += 1;
 			$("#filesLoaded").text(globals.filesLoaded);
 			globals.data.stateMetadata = response;
-			if (globals.filesLoaded == 4){
+			if (globals.filesLoaded == globals.requiredFiles){
 				$(document).trigger('filesLoaded');
 			}
 		},
@@ -220,12 +214,11 @@ function loadMapData(){
 		dataType:'json',
 		data:{},
 		success: function(response){
-			console.log("Loaded state metadata.");
 			globals.filesLoaded += 1;
 			$("#filesLoaded").text(globals.filesLoaded);
-			globals.data.mapData = response;//this is the topojson
+			globals.data.counties = response;//this is the topojson
 			//check if the file has been loaded
-			if (globals.filesLoaded == 4){
+			if (globals.filesLoaded == globals.requiredFiles){
 				$(document).trigger('filesLoaded');
 			}
 		},
@@ -233,6 +226,21 @@ function loadMapData(){
 			console.log(error);
 		}
 	});	 
+	$.ajax("assets/data/states.topojson", {
+		dataType: "json",
+		success: function(response){
+			globals.filesLoaded += 1;
+			$("#filesLoaded").text(globals.filesLoaded);
+			globals.data.states = response;
+			console.log(response);
+			if (globals.filesLoaded == globals.requiredFiles){
+				$(document).trigger('filesLoaded');
+			}
+		},
+		error: function(xhr, status, error){
+			console.log(error);
+		}
+	});
 }
 
 
@@ -265,7 +273,7 @@ function createMap(){
 	globals.map.counties = svg.append("g")
       .attr("class", "counties")
     .selectAll("path")
-	      .data(topojson.feature(globals.data.mapData, globals.data.mapData.objects.counties).features)
+	      .data(topojson.feature(globals.data.counties, globals.data.counties.objects.counties).features) // load the counties
 	    .enter().append("path")
 	      .attr("d", path)
 	      .style('fill', 'white')
@@ -273,12 +281,26 @@ function createMap(){
 	      .style('stroke-opacity', 0.25)
 	  	  .attr('FIPS', function(d){id = checkFIPS(d.id); //make sure it contains the first zero
 	  	  		return id;});	 //this is how we know the geographic identifier
-     globals.map.states = svg.append("path")
-      .datum(topojson.mesh(globals.data.mapData, globals.data.mapData.objects.states, function(a, b) { return a !== b; }))
+	  	  		
+	 //load the land
+     globals.map.land = svg.append("path")
+      .datum(topojson.mesh(globals.data.counties, globals.data.counties.objects.land))
       .attr("class", "states")
       .attr("d", path)
-      .style('fill', 'none')
-      .style('stroke', 'black');
+      .style('stroke', 'black')
+      .style('fill', 'none');
+      
+      globals.map.states = svg.append("g")
+      	.attr('class', 'states')
+      	.selectAll('path')
+      	 .data(topojson.feature(globals.data.states, globals.data.states.objects.units).features) // load the states
+      	 .enter().append('path')
+      	 .attr('d', path)
+      	 .style('fill', 'none')
+      	 .style('stroke', 'none')
+      	 .attr('code', function(d){
+      	 	return 
+      	 })
       
       
 
@@ -295,11 +317,11 @@ function createMap(){
 
 function createColorScale(data){
 	    var colorClasses = [ // the colors
-        "#ffffff",
-        "#c1a19c",
-        "#a2726b",
-        "#83423a",
-        "#651409"
+        "#fee5d9",
+        "#fcae91",
+        "#fb6a4a",
+        "#de2d26",
+        "#a50f15"
     ];
 	    //quantiles scale
 	    var colorScale = d3.scale.quantile()
@@ -325,7 +347,18 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	//returns nothing
 	//different breakpoints on the color scale
 	//States isn't working yet
+	try{
+		globals.map.tip.hide(); //make sure its gone
+	}catch (err){
+		console.log(err);
+	}
+	
 	 if(geographyType == 'Counties'){
+	 	//disable the states
+		globals.map.states.style('fill', 'none');
+		globals.map.states.style('stroke', 'none');
+		globals.map.land.style('stroke', 'none');
+		globals.map.land.style('fill', 'none'); 
 		toMap = aggregateByCounty(filteredInput);
 		globals.map.aggregateData = toMap;
 		if (normalizationType == "Area"){
@@ -388,31 +421,101 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	  	}catch(err){
 	  		val = 0
 	  	}
-		  	html = "<h6 class='page-header'>" + details.Geography + "</h6><br />"
+		  	html = "<h6>" + details.Geography + "</h6><br />"
 		  	html += "<label>Land Area: </label><span class='text-muted'>" + details.LandArea + " km<sup>2</sup></span><br />"
 		  	html += "<label>Population: </label><span class='text-muted'>" + details.Pop + "</span><br />"
 		  	html += "<label>Number of Disasters: </label><span class='text-muted'>" + val+ "</span><br />"
 		  	html += "<label>Percent of National Total: </label><span class='text-muted'>" + val/globals.currentTotal * 100+ "</span><br />"
 		 return html
 	  	
-	  })
+	  });
 	  
-	  globals.map.canvas.call(globals.map.tip)//enable the tooltip
+	  globals.map.canvas.call(globals.map.tip);//enable the tooltip
 	  
-	  globals.map.counties.on('mouseover', globals.map.tip.show)
-	  globals.map.counties.on('mouseout', globals.map.tip.hide)
+	  globals.map.counties.on('mouseover', globals.map.tip.show);
+	  globals.map.counties.on('mouseout', globals.map.tip.hide);
 	   
 	} // end counties block
 	else if (geographyType == "States"){
-		return 
-	}
+		console.log('Got to updateMap states');
+		//disable the counties
+		globals.map.counties.style('fill', 'none');
+		globals.map.counties.style('stroke', 'none');
+		globals.map.land.style('stroke', 'none');
+		globals.map.land.style('fill', 'none'); 
+		
+		//setup the new data
+		toMap = aggregateByState(filteredInput);
+		globals.map.aggregateData = toMap;
+		if (normalizationType == "Area"){
+			toMap = normalize("States", "Area", toMap);
+		}else if (normalizationType == "None"){
+			toMap = normalize("States", "None", toMap);
+		}
+		console.log(toMap);
+		idToValueMap = {};
+		//do the drawing
+		globals.map.colorScale = createColorScale(toMap);
+		//populate the id/value lookup
+	    _.each(toMap, function(d){
+	    	idToValueMap[d.geography] = {value: +d.value, geography: d.geography};});
+	    globals.map.idToValueMap = idToValueMap;
+	    allIDS = [];
+	    globals.map.states.style('fill', function(d){
+	    	thisID = fixPostalCode(d.id);
+	    	allIDS.push(thisID);
+			lookup = idToValueMap[thisID];
+			try{
+				thisValue = idToValueMap[thisID].value;
+			}catch (err){
+				thisValue = 0;
+			}
+			if (thisValue == -1){
+				return 'gray';
+			}else if (thisValue >= 0){
+				c = globals.map.colorScale(thisValue);
+				return globals.map.colorScale(thisValue);
+			}
+	   });
+
+	   globals.map.states.on('click', function(d){
+		   	code = d.id;
+		   	state = fixPostalCode(code);
+			console.log(getStateDetails(state))
+	   });
+	   
+	   	// //tooltips //TODO: Change to popup overlay
+	 globals.map.tip = d3.tip()
+	  .attr('class', 'd3-tip')
+	  .offset([-10, 0])
+	  .html(function(d){
+	  	details = getStateDetails(fixPostalCode(d.id));
+	  	try{
+	  		val = globals.map.aggregateData[fixPostalCode(d.id)].length;
+	  	}catch(err){
+	  		val = 0
+	  	}
+		  	html = "<h6>" + details.geography + "</h6><br />"
+		  	html += "<label>Land Area: </label><span class='text-muted'>" + details.Area + " km<sup>2</sup></span><br />"
+		  	html += "<label>Population: </label><span class='text-muted'>" + details.Pop + "</span><br />"
+		  	html += "<label>Number of Disasters: </label><span class='text-muted'>" + val+ "</span><br />"
+		  	html += "<label>Percent of National Total: </label><span class='text-muted'>" + val/globals.currentTotal * 100+ "</span><br />"
+		 return html
+	  	
+	  });
+	  
+	  globals.map.canvas.call(globals.map.tip);//enable the tooltip
+	  
+	  globals.map.states.on('mouseover', globals.map.tip.show);
+	  globals.map.states.on('mouseout', globals.map.tip.hide);
+		
+	}//end states block
 	
 	globals.filteredData = filteredInput
 	//do other updates
 	displayMapTotal(filteredInput);
 	displayPercentTotal(filteredInput)
 	updateTypePieChart();
-	updateStatesPieChart();
 	updateBarCharts(filteredInput, globals.temporalFilter);
 };
 
@@ -470,7 +573,7 @@ function updateTypePieChart(){
     globals.pie.path.append("path")
       .attr("d", globals.pie.arc)
       .style("fill", function(d) { 
-      	color = globals.pie.colorScale(d.data.Category)
+      	color = globals.pie.colorScale(d.data.Category);
       	return color; });
 
   // globals.pie.path.append("text")
@@ -481,11 +584,11 @@ function updateTypePieChart(){
 	 //here is the tooltip for this item
 	 globals.pie.tip = d3.tip()
 	  .attr('class', 'd3-tip')
-	  .offset([-10, 0])
+	  .offset([-10, 0]);
 
 
  //event listeners
-	globals.pie.svg.call(globals.pie.tip)//enable the tooltip
+	globals.pie.svg.call(globals.pie.tip); //enable the tooltip
       
  globals.pie.path.on('mouseover', function(){
  	var slice = d3.select(this);
@@ -744,106 +847,21 @@ $(window).resize(function(){
 
 
 
-//build the pie chart showing composition
-function buildStatesPieChart(data){
-	//build the chart
-	globals.statesPie.height = $("#stateChartHolder").height();
-	globals.statesPie.width = $("#stateChartHolder").width();
-	globals.statesPie.radius = Math.min(globals.pie.width, globals.pie.height) / 2;
-	globals.statesPie.colorScale = d3.scale.category20();
-    
-    globals.statesPie.arc = d3.svg.arc()
-    .outerRadius(globals.pie.radius - 10)
-    .innerRadius(0);
-    
-    // globals.pie.labelArc = d3.svg.arc()
-    // .outerRadius(globals.pie.radius - 40)
-    // .innerRadius(globals.pie.radius - 40);
-//     
-   globals.statesPie.pie = d3.layout.pie()
-    .sort(function(d){return d.Value})
-    .value(function(d) { return d.Value; });
-      
-   d3.selectAll(".temporalSlider")
-      .on("change", function(){
-      	updateStatesPieChart();
-      });
-  
-  globals.statesPie.svg = d3.select("#stateChartHolder").append("svg")
-    .attr("width", globals.statesPie.width)
-    .attr("height", globals.statesPie.height)
-  .append("g")
-    .attr("transform", "translate(" + globals.statesPie.width / 2 + "," + globals.statesPie.height / 2 + ")");
-}
 
 
-
-function updateStatesPieChart(){
-	// //update the pie chart with new data  
-	inputData = globals.filteredData
-	data = calculatePieChartComp(aggregateByState(inputData)) // this will have been updated by the event listeners  
-	globals.statesPie.svg.selectAll(".arc")
-		.remove()
-   globals.statesPie.path = globals.statesPie.svg.selectAll(".arc")
-      .data(globals.statesPie.pie(data))
-    .enter().append("g")
-      .attr("class", "arc")
-      .attr('type', function(d){
-      	return d.data.Category
-      })
-      .attr('dataValue', function(d){
-      	return d.data.Value
-      });
-      
-    globals.statesPie.path.append("path")
-      .attr("d", globals.pie.arc)
-      .style("fill", function(d) { 
-      	color = globals.statesPie.colorScale(d.data.Category)
-      	return color; });
-
-  // globals.pie.path.append("text")
-      // .attr("transform", function(d) { return "translate(" + globals.pie.labelArc.centroid(d) + ")"; })
-      // .attr("dy", ".35em")
-      // .text(function(d) { return d.data.Type; });
-   
-	 //here is the tooltip for this item
-	 globals.statesPie.tip = d3.tip()
-	  .attr('class', 'd3-tip')
-	  .offset([-10, 0])
-
-
- //event listeners
-	globals.statesPie.svg.call(globals.statesPie.tip)//enable the tooltip
-      
- globals.statesPie.path.on('mouseover', function(){
- 	var slice = d3.select(this);
- 	slice.attr('stroke', 'white');
- 	var disType = slice.attr('type');
- 	var disVal = slice.attr('dataValue');
- 	if (globals.currentTotal != 0){//catch div!/0 errors
- 		var disPct = Math.round((disVal / globals.currentTotal) * 100); //percent of total
- 	}
- 	else{
- 		var disPct = 0;
- 	}
- 	var txt = "<label>" + disType + ":  </label><span>" + disVal + "   </span><span class='text-muted'>(" + disPct + "%)</span>";
- 	globals.statesPie.tip.html(txt);
- 	globals.statesPie.tip.show()
- });
- globals.statesPie.path.on('mouseout', function(){
- 	d3.select(this).attr('stroke', 'none') // clear the formatting
- 	globals.statesPie.tip.hide()
- });
- 
-
- 
-}
 
 
 
 //change normalization type in GUI
 $("input[name=normType]").on('change', function(){
 	globals.mapConfig.normType = $(this).val()
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
+});
+
+//change geog type in GUI
+$("input[name=geogType]").on('change', function(){
+	console.log("Changed geography to " + $(this).val());
+	globals.mapConfig.geogType = $(this).val()
 	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
 });
 
@@ -874,4 +892,8 @@ function setType(t){
 		t = t.substring(0,1).toUpperCase() + t.substring(1, t.length).toLowerCase();
 		$("#dis-title").text(t)
 }
+
+
+
+
 
