@@ -5,12 +5,16 @@
 //	jQuery
 //  d3.js
 // underscore.js
-// date.js
 
 //TODO:
 //automatic scale calculation
-//popup over map
-//styling
+//composition chart
+//update map with colors
+//panel styling
+//legend
+//popup styling
+
+
 
 
 var globals = {};
@@ -37,12 +41,23 @@ globals.temporalFilter = {
 	maxMonth: 12,
 }; //this is the current filter on years and months
 
-globals.pie = {};//pie chart stuff
 globals.currentTotal = 0; //total number of disasters with current filters;
 globals.mapConfig = {};
 globals.mapConfig.geogType = 'Counties';
 globals.mapConfig.normType = "None";
+globals.mapConfig.numClasses = 5;
 globals.mapConfig.inputData = []
+globals.map.colorScheme = [
+	['#fee6ce', '#e6550d'],//2 classes
+	['#fee6ce','#fdae6b','#e6550d'], // 3 classes,
+	['#feedde','#fdbe85','#fd8d3c','#d94701'], //four classes
+	['#feedde','#fdbe85','#fd8d3c','#e6550d','#a63603'], //five classes
+	['#feedde','#fdd0a2','#fdae6b','#fd8d3c','#e6550d','#a63603'], //six classes
+	['#feedde','#fdd0a2','#fdae6b','#fd8d3c','#f16913','#d94801','#8c2d04'] // seven classes
+];
+globals.breakdown = {};
+globals.breakdown.type = {};
+globals.breakdown.hist = {};
 
 
 /////-----Important action functions ----////////
@@ -57,47 +72,15 @@ $(document).ready(function(){
 function loadPlatform(){
 	//called once all of the data has been loaded into the map
 	$("#currentTask").text("All files have been loaded.  Building interface.");
+	populateColorSelect();
 	globals.allDisasterTypes = getAllDisasterTypes(globals.data.fema);
-	 populateTypeSelect(); //creates the type selection dropdown menu
 	 createMap(); // creates the map
-	 buildTypePieChart(calculatePieChartComp(aggregateByType(globals.data.fema))); //builds a pie chart of the composition by type
 	 //set up the map with the default config
 	 globals.mapConfig.inputData = globals.data.fema;
 	 buildBarCharts();//these are the filter charts
-	 updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.data.fema);//colors the choropleth map 
+	 updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.data.fema, globals.mapConfig.numClasses);//colors the choropleth map 
 }
 
-function populateTypeSelect(){
-	//this function loads the select widget in the UI
-	//could add a sort here?
-	$("#typeSelect").append("<option>All Disasters</option>");
-	dTypes =globals.allDisasterTypes;
-	for (var i=0; i< dTypes.length; i++){
-		opt = "<option>" + dTypes[i] + "</option>";
-		$("#typeSelect").append(opt);
-	}
-	//add event listeners for optgroup change
-	$("#typeSelect").change(function(){
-		var option =  this.options[this.selectedIndex];
-		optionText = $(option).text();
-		if (optionText == "All Disasters"){
-			optionText = "All";
-		};
-		globals.currentTypeFilter = optionText; // set the filter
-		//filter
-		if (optionText != "All"){
-			newData = filterByType(globals.data.fema, optionText);
-				
-		}else{
-			newData = globals.data.fema;
-		}
-		//apply any existing temporal filtering
-		newData = filterByTimeRange(newData, globals.temporalFilter);
-		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData);		
-		globals.filteredData = newData;
-		 
-	});
-}
 
 function configureTimeFilter(){
 	//event handler for min and max month sliders
@@ -125,7 +108,7 @@ function configureTimeFilter(){
 	}
 	//now do the temporal filtering
 	newData = filterByTimeRange(newData, globals.temporalFilter);
-	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData);
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData, globals.mapConfig.numClasses);
 	globals.filteredData = newData;
 }
 
@@ -272,8 +255,8 @@ function createMap(){
 	      .data(topojson.feature(globals.data.counties, globals.data.counties.objects.counties).features) // load the counties
 	    .enter().append("path")
 	      .attr("d", path)
-	      .style('fill', 'white')
-	      .style('stroke', 'black')
+	      .style('fill', 'none')
+	      .style('stroke', 'none')
 	      .style('stroke-opacity', 0.25)
 	  	  .attr('FIPS', function(d){id = checkFIPS(d.id); //make sure it contains the first zero
 	  	  		return id;});	 //this is how we know the geographic identifier
@@ -293,10 +276,7 @@ function createMap(){
       	 .enter().append('path')
       	 .attr('d', path)
       	 .style('fill', 'none')
-      	 .style('stroke', 'none')
-      	 .attr('code', function(d){
-      	 	return 
-      	 })
+      	 .style('stroke', 'none');
       
       
 
@@ -311,14 +291,8 @@ function createMap(){
 }
 
 
-function createColorScale(data){
-	    var colorClasses = [ // the colors
-        "#fee5d9",
-        "#fcae91",
-        "#fb6a4a",
-        "#de2d26",
-        "#a50f15"
-    ];
+function createColorScale(data, numClasses){
+	    var colorClasses = chooseColorScheme(numClasses);
 	    //quantiles scale
 	    var colorScale = d3.scale.quantile()
 	        .range(colorClasses);
@@ -336,7 +310,7 @@ function createColorScale(data){
 	    return colorScale;
 }
 
-function updateMap(geographyType, normalizationType, filteredInput){
+function updateMap(geographyType, normalizationType, filteredInput, numClasses){
 	//accepts a geography type of 'Counties' or 'States' and an array of input filtered in the desired way
 	//accepts a normalization type of 'Pop', 'Area', or 'None'
 	//function aggreages to the desired geography and then sets the choropleth colors
@@ -345,11 +319,14 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	//States isn't working yet
 	try{
 		globals.map.tip.hide(); //make sure its gone
+		d3.select(".d3-tip").remove();
 	}catch (err){
 		console.log(err);
 	}
 	
+	
 	 if(geographyType == 'Counties'){
+	 	
 	 	//disable the states
 		globals.map.states.style('fill', 'none');
 		globals.map.states.style('stroke', 'none');
@@ -364,7 +341,7 @@ function updateMap(geographyType, normalizationType, filteredInput){
 		}
 		idToValueMap = {};
 		
-		globals.map.colorScale = createColorScale(toMap);
+		globals.map.colorScale = createColorScale(toMap, numClasses);
 		//populate the id/value lookup
 	    _.each(toMap, function(d){
 	    	idToValueMap[checkFIPS(d.geography).toString()] = {value: +d.value, geography: checkFIPS(d.geography)};});
@@ -389,6 +366,8 @@ function updateMap(geographyType, normalizationType, filteredInput){
 				return globals.map.colorScale(thisValue);
 			}
 	   });
+	   globals.map.counties.style("stroke", 'white');
+	   globals.map.counties.style("stroke-width", 0.25)
 
 	   globals.map.counties.on('click', function(d){
 	    	thisID = checkFIPS(d3.select(this).attr('FIPS'));
@@ -428,17 +407,21 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	  
 	  globals.map.canvas.call(globals.map.tip);//enable the tooltip
 	  
+	  
 	  globals.map.counties.on('mouseover', globals.map.tip.show);
 	  globals.map.counties.on('mouseout', globals.map.tip.hide);
 	   
 	} // end counties block
 	else if (geographyType == "States"){
+		d3.select(".d3-tip").remove();
 		console.log('Got to updateMap states');
 		//disable the counties
 		globals.map.counties.style('fill', 'none');
 		globals.map.counties.style('stroke', 'none');
 		globals.map.land.style('stroke', 'none');
 		globals.map.land.style('fill', 'none'); 
+		globals.map.states.style("stroke", 'white');
+		globals.map.states.style("stroke-width", 0.25)
 		
 		//setup the new data
 		toMap = aggregateByState(filteredInput);
@@ -451,7 +434,7 @@ function updateMap(geographyType, normalizationType, filteredInput){
 		console.log(toMap);
 		idToValueMap = {};
 		//do the drawing
-		globals.map.colorScale = createColorScale(toMap);
+		globals.map.colorScale = createColorScale(toMap, numClasses);
 		//populate the id/value lookup
 	    _.each(toMap, function(d){
 	    	idToValueMap[d.geography] = {value: +d.value, geography: d.geography};});
@@ -511,115 +494,17 @@ function updateMap(geographyType, normalizationType, filteredInput){
 	//do other updates
 	displayMapTotal(filteredInput);
 	displayPercentTotal(filteredInput)
-	updateTypePieChart();
 	updateBarCharts(filteredInput, globals.temporalFilter);
+	createBreakdownCharts(filteredInput);
 };
 
-//build the pie chart showing composition
-function buildTypePieChart(data){
-	//build the chart
-	globals.pie.height = $("#typeChartHolder").height();
-	globals.pie.width = $("#typeChartHolder").width();
-	globals.pie.radius = Math.min(globals.pie.width, globals.pie.height) / 2;
-	globals.pie.colorScale = d3.scale.category20();
-    
-    globals.pie.arc = d3.svg.arc()
-    .outerRadius(globals.pie.radius - 10)
-    .innerRadius(0);
-    
-    // globals.pie.labelArc = d3.svg.arc()
-    // .outerRadius(globals.pie.radius - 40)
-    // .innerRadius(globals.pie.radius - 40);
-//     
-   globals.pie.pie = d3.layout.pie()
-    .sort(function(d){return d.Value})
-    .value(function(d) { return d.Value; });
-      
-   d3.selectAll(".temporalSlider")
-      .on("change", function(){
-      	updateTypePieChart();
-      });
-  
-  globals.pie.svg = d3.select("#typeChartHolder").append("svg")
-    .attr("width", globals.pie.width)
-    .attr("height", globals.pie.height)
-  .append("g")
-    .attr("transform", "translate(" + globals.pie.width / 2 + "," + globals.pie.height / 2 + ")");
-}
 
-
-
-function updateTypePieChart(){
-	// //update the pie chart with new data  
-	inputData = globals.filteredData
-	data = calculatePieChartComp(aggregateByType(inputData)) // this will have been updated by the event listeners  
-	globals.pie.svg.selectAll(".arc")
-		.remove()
-   globals.pie.path = globals.pie.svg.selectAll(".arc")
-      .data(globals.pie.pie(data))
-    .enter().append("g")
-      .attr("class", "arc")
-      .attr('type', function(d){
-      	return d.data.Category
-      })
-      .attr('dataValue', function(d){
-      	return d.data.Value
-      });
-      
-    globals.pie.path.append("path")
-      .attr("d", globals.pie.arc)
-      .style("fill", function(d) { 
-      	color = globals.pie.colorScale(d.data.Category);
-      	return color; });
-
-  // globals.pie.path.append("text")
-      // .attr("transform", function(d) { return "translate(" + globals.pie.labelArc.centroid(d) + ")"; })
-      // .attr("dy", ".35em")
-      // .text(function(d) { return d.data.Type; });
-   
-	 //here is the tooltip for this item
-	 globals.pie.tip = d3.tip()
-	  .attr('class', 'd3-tip')
-	  .offset([-10, 0]);
-
-
- //event listeners
-	globals.pie.svg.call(globals.pie.tip); //enable the tooltip
-      
- globals.pie.path.on('mouseover', function(){
- 	var slice = d3.select(this);
- 	slice.attr('stroke', 'white');
- 	var disType = slice.attr('type');
- 	var disVal = slice.attr('dataValue');
- 	if (globals.currentTotal != 0){//catch div!/0 errors
- 		var disPct = Math.round((disVal / globals.currentTotal) * 100); //percent of total
- 	}
- 	else{
- 		var disPct = 0;
- 	}
- 	var txt = "<label>" + disType + ":  </label><span>" + disVal + "   </span><span class='text-muted'>(" + disPct + "%)</span>";
- 	globals.pie.tip.html(txt);
- 	globals.pie.tip.show()
- });
- globals.pie.path.on('mouseout', function(){
- 	d3.select(this).attr('stroke', 'none') // clear the formatting
- 	globals.pie.tip.hide();
- });
- globals.pie.path.on('click', function(){
- 	 	globals.pie.tip.hide();
- 	type = d3.select(this).attr('type');
- 	setType(type);
- });
- 
-
- 
-}
 
 function buildBarCharts(){
 	//temporal unit is either Year, Month
 	//builds a base bar chart on top of which the filter is displayed
-	globals.barcharts.width = $("#yearBarChart").width() ;//same for both charts
-	globals.barcharts.height = $("#yearBarChart").height() * .8;
+	globals.barcharts.width = $("#year-filter-holder").width() ;//same for both charts
+	globals.barcharts.height = $("#yearBarChart").height();
 	globals.barcharts.margins = {
 		top: 5,
 		bottom: 25,
@@ -776,7 +661,7 @@ function updateBarCharts(data, temporalFilter){
 	  	return "<label>" + d.year + ":  </label><span class='text-muted'>" + d.value + "</span>"
 	  })
 	  
-	  globals.barcharts.yearBarCanvas.call(globals.barcharts.yearTip)//enable the tooltip
+	 // globals.barcharts.yearBarCanvas.call(globals.barcharts.yearTip)//enable the tooltip
 	 
 	 
 	 //month chart 
@@ -787,7 +672,7 @@ function updateBarCharts(data, temporalFilter){
 	  	return "<label>" + d.month + ":  </label><span class='text-muted'>" + d.value + "</span>"
 	  })
 	  
-	  globals.barcharts.yearBarCanvas.call(globals.barcharts.monthTip)//enable the tooltip
+	 // globals.barcharts.yearBarCanvas.call(globals.barcharts.monthTip)//enable the tooltip
 	
 	//stuff for year bars
 	console.log(d3.extent(yearData, function(d){ return +d.year}))
@@ -841,6 +726,7 @@ function setType(t){
 			t = "All";
 		};
 		globals.currentTypeFilter = t; // set the filter
+		$("#dis-title").text(t)
 		//filter
 		if (t != "All"){
 			newData = filterByType(globals.data.fema, t);
@@ -849,16 +735,92 @@ function setType(t){
 		}
 		//apply any existing temporal filtering
 		newData = filterByTimeRange(newData, globals.temporalFilter);
-		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData);		
+		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, newData, globals.mapConfig.numClasses);		
 		globals.filteredData = newData;
 		
 		//update the display
 		//convert to title case
 		t = t.substring(0,1).toUpperCase() + t.substring(1, t.length).toLowerCase();
+		console.log(t);
 		$("#dis-title").text(t)
 }
 
 
 
+function chooseColorScheme(numClasses){
+	//selects the right color array for this number of classes
+	index = numClasses - 2; 
+	cs = globals.map.colorScheme[index];
+	console.log(numClasses);
+	return cs;
+}
 
+function createBreakdownCharts(data){
+	data = aggregateByType(data);
+	data = convertAggregateToPercent(data, globals.currentTotal);
+	var margin = {top: 20, right: 20, bottom: 100, left: 40};
+	var height = 700 - margin.top - margin.bottom; //these are static because they collapse and its annoying-- TODO fix;
+	var width = 300 - margin.left - margin.right;
+	
+	globals.breakdown.canvas = d3.select("#breakdownCharts").append("svg")
+		.attr('height', height + margin.top + margin.bottom)
+		.attr('width', width + margin.left + margin.bottom)
+		.append("g")
+    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	var y = d3.scale.linear()
+		.range([height, 0])
+		.domain([0, 100]);
+	
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left");
+	//axis
+	globals.breakdown.canvas.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("% of total");
+	
+	runningY = 0;
+	for (var i =0; i < data.length; i++){
+		globals.breakdown.canvas.append("rect")
+			.attr('height',y(data[i]['percent']))
+			.attr('y', runningY)
+			.attr('x', 25)
+			.attr('width', 100)
+			.attr('fill', 'green')
+			.attr('stroke', 'white')
+			.on('mouseover', function(d){
+				
+			});
+		runningY += data[i]['percent'];
+		console.log(runningY)
+		
+	}
+// 	    
+	
+	
+	
+}
 
+function populateColorSelect(){
+	//create the color swatches in the map options panel
+	var table = $("#classTable");
+	var rows = table.find('tr');
+	console.log(rows);
+	for (var i=0; i< globals.map.colorScheme.length; i++){
+		var thisRow = rows[i];
+		var theseColors = globals.map.colorScheme[i];
+		for (var p=0; p<theseColors.length; p++){
+			var thisColor = theseColors[p];
+			var element = "<td class='swatch' style='background-color:" + thisColor + "'></td>";
+			$(thisRow).append(element);
+		}
+	}
+	
+}

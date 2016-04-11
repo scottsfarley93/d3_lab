@@ -3,7 +3,6 @@ $('.filter-caption').hide();
 $("#extra-bar").hide();
 $(document).ready(function(){
 	$(".menu-icon").mouseover(function(){
-		console.log("mouseover fired");
 		$(this).css({
 			opacity: 0.5,
 			width: '200%'
@@ -24,7 +23,16 @@ $(document).ready(function(){
 	$(".dis-btn").click(function(){
 		closeInfoWindow();
 	});
-	
+	$(".apply-button").mouseover(function(){
+		$(".apply-btn-text").text("Apply Changes");
+	});
+	$(".apply-button").mouseout(function(){
+		$(".apply-btn-text").text("");
+	});
+	$(".apply-button").click(function(){
+		//reennable glyph 
+		closeInfoWindow();
+	});
 	
 	$("#help-filter-button").click(function(){
 		var clicked = $(this).data('clicked');
@@ -35,6 +43,7 @@ $(document).ready(function(){
 			$("#temporal-filters").hide();
 			$("#breakdown").hide();
 			$("#help").show();
+			$("#map-settings").hide();
 			$(this).data('clicked', true);
 			$("#extra-bar").css({overflow: 'auto'});
 		}else{
@@ -52,6 +61,7 @@ $(document).ready(function(){
 			$("#temporal-filters").hide();
 			$("#breakdown").hide();
 			$("#help").hide();	
+			$("#map-settings").hide();
 			$(this).data('clicked', true);
 			$("#extra-bar").css({overflow: 'hidden'});	
 		}else{
@@ -69,6 +79,7 @@ $(document).ready(function(){
 			$("#breakdown").hide();
 			$("#help").hide();
 			openInfoWindow();
+			$("#map-settings").hide();
 			$(this).data('clicked', true);
 			$("#extra-bar").css({overflow: 'hidden'});
 		}else{
@@ -83,6 +94,25 @@ $(document).ready(function(){
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
 			$("#breakdown").show();
+			$("#help").hide();
+			openInfoWindow();
+			$("#map-settings").hide();
+			$(this).data('clicked', true);
+			$("#extra-bar").css({'overflow': 'hidden'});
+		}else{
+			closeInfoWindow();
+			$(this).data('clicked', false);
+		}
+
+	});
+	$("#settings-filter-button").click(function(){
+		var clicked = $(this).data('clicked');
+		if (!clicked){
+			$("#filter-header").text("Map Settings");
+			$('#disaster-grid').hide();
+			$("#temporal-filters").hide();
+			$("#breakdown").hide();
+			$("#map-settings").show();
 			$("#help").hide();
 			openInfoWindow();
 			$(this).data('clicked', true);
@@ -103,14 +133,14 @@ $(document).ready(function(){
 	//change normalization type in GUI
 	$("input[name=normType]").on('change', function(){
 		globals.mapConfig.normType = $(this).val()
-		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
+		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData, globals.mapConfig.numClasses);
 	});
 	
 	//change geog type in GUI
 	$("input[name=geogType]").on('change', function(){
 		console.log("Changed geography to " + $(this).val());
 		globals.mapConfig.geogType = $(this).val()
-		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData);
+		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData, globals.mapConfig.numClasses);
 	});
 	
 	//event listeners for the temporal filters
@@ -118,6 +148,18 @@ $(document).ready(function(){
 	$("#monthSliderMax").change(configureTimeFilter);
 	$("#yearSliderMin").change(configureTimeFilter);
 	$("#yearSliderMax").change(configureTimeFilter);
+	
+	//hook up class changes
+	//and do it if they click on a row of colors too
+	$(".colorSelect").click(function(){
+		var numClasses = +$(this).data('numclasses');
+		console.log("Changing number of classes to " + numClasses);
+		globals.mapConfig.numClasses = numClasses;
+		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData, globals.mapConfig.numClasses);
+		//set the radio button
+		$(this).find("input").prop('checked', true);
+	});
+	
 });//end doc ready fn
 
 //resize map on extra bar open
@@ -131,3 +173,4 @@ function openInfoWindow(){
 	$("#extra-bar").show();
 	$("#map-window").addClass("col-xs-7").removeClass('col-xs-11');
 }
+

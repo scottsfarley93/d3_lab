@@ -322,6 +322,14 @@ function clearMap(){
 	$("#map").empty();
 }
 
+function convertAggregateToPercent(inputAgg, total){
+	data = _.map(inputAgg, function(value, key, list){
+		return {type: key, percent: (value.length / total) * 100};
+	});
+	data = _.sortBy(data, function(d){return d.percent});
+	return data;
+}
+
 /// Handle window resize
 function onResize(){
 	//on document resize

@@ -29,42 +29,44 @@
 			<div id='filter-bar' class='col-xs-6'>
 				<div id='type-filter-icon' class='menu-icon'>
 					<button id='type-filter-button' class='filter-button' data-clicked='false'>
-						<img src='assets/img/thumbs/all.svg'/>
 						<label class='caption filter-caption' id='type-caption'>
-							Filter by Disaster Type
+							Disaster Type
 						</label>
+						<img src='assets/img/thumbs/all.svg'/>
 					</button>
 				</div>
 				<div id='time-filter-icon' class='menu-icon'>
+		
 					<button id='time-filter-button' class='filter-button' data-clicked='false'>
-						<img src='assets/img/thumbs/time.svg'/>
-						<label class='caption filter-caption' id='temporal-caption'>
-							Filter by Temporal Range
+							<label class='caption filter-caption' id='temporal-caption'>
+							Temporal Range
 						</label>
+						<img src='assets/img/thumbs/time.svg'/>
 					</button>
 				</div>
 				<div id='pie-filter-icon' class='menu-icon'>
 					<button id='pie-filter-button' class='filter-button' data-clicked='false'>
-						<img src='assets/img/thumbs/pie.svg'/>
 						<label class='caption filter-caption' id='breakdown-caption'>
-							Show Breakdown
-						</label>						
+							Breakdown
+						</label>
+						<img src='assets/img/thumbs/pie.svg'/>						
 					</button>
 				</div>				
 				<div id='settings-filter-icon' class='menu-icon'>
 					<button id='settings-filter-button' class='filter-button' data-clicked='false'>
-						<img src='assets/img/thumbs/settings.svg'/>
-						<label class='caption filter-caption' id='breakdown-caption'>
+							<label class='caption filter-caption' id='breakdown-caption'>
 							Map Settings
-						</label>						
+						</label>
+						<img src='assets/img/thumbs/settings.svg'/>
+						
 					</button>
 				</div>
 				<div id='help-filter-icon' class='menu-icon'>
 					<button id='help-filter-button' class='filter-button' data-clicked='false'>
-						<img src='assets/img/thumbs/help.svg'/>
 						<label class='caption filter-caption' id='help-caption'>
-							Show Application Help
+							Help
 						</label>
+						<img src='assets/img/thumbs/help.svg'/>
 					</button>
 				</div>
 			</div><!--End filter bar-->
@@ -173,29 +175,31 @@
 					</div>
 				</div><!--end dis grid-->
 				<div class='col-xs-11' id='temporal-filters'>
-					<div id='year-filter-holder' class='temporal-filter-holder'>
+					<div id='year-filter-holder' class='temporal-filter-holder col-xs-12'>
 					<h4 class='header'>
 						Filter by Year
 					</h2>
-					<div id='yearFilter'>
-						<div id='yearBarChart' class='temporalBar'></div>
+					<div id='yearFilter col-xs-12'>
+						<div id='yearBarChart' class='temporalBar col-xs-12'></div>
 						<span>Min Year: </span><span id='minYearText'>1960</span><input class='temporalSlider' type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input class='temporalSlider' type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
 					</div>
 				</div>
-				<div id='month-filter-holder' class='temporal-filter-holder'>
+				<div id='month-filter-holder' class='temporal-filter-holder col-xs-12'>
 					<h4 id='monthFilter' class='header'>
 						Filter by Month
 					</h2>
-					<div id='monthFilter'>
-						<div id='monthBarChart' class='temporalBar'></div>
+					<div id='monthFilter' class='col-xs-12'>
+						<div id='monthBarChart' class='temporalBar col-xs-12'></div>
 						<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' class='temporalSlider' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input class='temporalSlider' type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
 					</div>
-					<button id='exit-temporal-filter' class='btn btn-default'>Apply</button>
+				<button class='btn btn-default apply-button'><span class='apply-btn-text'></span><span class='glyphicon glyphicon-check'></span></button>
 				</div>
 				
 				</div><!--end temporal filters-->
-				<div id='breakdown'>
-					
+				<div id='breakdown' class='col-xs-11'>
+					<div id='breakdownCharts' class='col-xs-12'>
+						
+					</div>
 				</div>
 				<div id='help'>
 					<p class='help-p'>
@@ -211,6 +215,31 @@
 						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 					</p>
 				</div>
+				<div id='map-settings'>
+				<h4 class='header'>Data Normalization</h2>
+					<div class='settings-holder'>
+					<label>Raw</label><input name='normType' value='None' type='radio' checked/><br />
+					<label>Area (Disasters / km<sup>2</sup>)</label><input name='normType' value='Area' type='radio'/>
+				</div>
+				<h4 class='header'>Geography Type</h2>
+				<div class='settings-holder'>
+					<label>Counties</label><input name='geogType' value='Counties' type='radio' checked/><br />
+					<label>States</label><input name='geogType' value='States' type='radio'/>
+				</div>
+				<h4 class='header'>Map Classes</h2>
+				<div class='settings-holder'>
+					
+					<table id='classTable'>
+					<tr id='colorSelect2' data-numClasses='2' class='colorSelect'><td><input name='numClasses' value='2' type='radio'/><label>Two</label></td></tr>
+					<tr id='colorSelect3' data-numClasses='3' class='colorSelect'><td><input name='numClasses' value='3' type='radio'/><label>Three</label></td></tr>
+					<tr id='colorSelect4' data-numClasses='4' class='colorSelect'><td><input name='numClasses' value='4' type='radio'/><label>Four</label></td></tr>
+					<tr id='colorSelect5' data-numClasses='5' class='colorSelect'><td><input name='numClasses' value='5' type='radio' checked/><label>Five</label></td></tr>
+					<tr id='colorSelect6' data-numClasses='6' class='colorSelect'><td><input name='numClasses' value='6' type='radio'/><label>Six</label></td></tr>
+					<tr id='colorSelect7' data-numClasses='7' class='colorSelect'><td><input name='numClasses' value='7' type='radio'/><label>Seven</label></td></tr>
+					</table>
+				</div>
+				<button class='btn btn-default apply-button'><span class='apply-btn-text'></span><span class='glyphicon glyphicon-check'></span></button>
+				</div>
 			</div> <!--end extra bar-->
 				  
 				  <div id='map-window' class='col-xs-11'>
@@ -220,11 +249,11 @@
 			
 			
 		<div id='header-info'>
-					<h3 class='page-header'>All Disasters</h3>
+					<h3 class='page-header' id='dis-title'>All Disasters</h3>
 					<label>Years: </label><span class='text-muted' id='yearRange'></span><br />
 					<label>Months: </label><span class='text-muted' id='monthRange'></span><br />
 					<label>Historic Total: </label><span class='text-muted' id='currentNumDisasters'></span><br />
-					<label>Percent of Total: </label><span class='text-muted' id='percentTotal'></span><br />
+					<label>Percent of All Disasters: </label><span class='text-muted' id='percentTotal'></span><br />
 	</div> <!--end of header-->
 
     

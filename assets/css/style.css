@@ -6,6 +6,7 @@ html, body, #main, #filterControls{
 	margin: 0%;
 	padding: 0%;
 	background-color: black;
+	overflow: hidden;
 }
 .row{
 	padding: 0%;
@@ -203,14 +204,14 @@ html, body, #main, #filterControls{
 	width: 50px;
 }
 #filter-bar{
-	height: 75%;
+	height: 100%;
 	padding: 0px;
 	border-radius: 5px;
 	max-height: 75%;
 	background-color: black;
 }
 .menu-icon{
-	height: 30%;
+	height: 27.5%;
 	padding: 0px;
 	margin:0px;
 	opacity: 0.25;
@@ -271,4 +272,39 @@ html, body, #main, #filterControls{
 #extra-bar{
 	max-height: 100%;
 	overflow: auto;
+}
+.settings-holder{
+	padding: 5%;
+}
+.apply-button{
+	color: green;
+}
+.apply-btn-text{
+	padding-right: 10%;
+}
+
+.swatch{
+	width: 25px;
+	height: 25px;
+}
+#breakdown{
+	height: 75%;
+}
+#breakdownCharts{
+	height: 100%;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
 }
