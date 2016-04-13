@@ -340,3 +340,10 @@ html, body, #main{
 .tip-info{
 	padding-left: 5px;
 }
+#footer{
+	right: 1%;
+	text-align: right;
+	bottom: 1%;
+	z-index: 10001;
+	position: absolute;
+}
