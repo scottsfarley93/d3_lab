@@ -323,6 +323,7 @@ function clearMap(){
 }
 
 function aggregateByMapClass(data, colorArray){
+	//aggregates so we know how many enum units are in each map class --> used to create a legend
 	data = aggregateByCounty(data);
 	comp = []
 	var numTotal;
@@ -405,14 +406,17 @@ function onResize(){
 }
 
 function round2(num){
+	//rounds to at most two decimal places
 	return Math.round(num * 100) / 100;
 }
 function formatNumber(num){
+	//formats a long number with a comma 1,000,000
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 
 d3.selection.prototype.moveToFront = function() {  
+	//allows you to bring an enumeration unit to the front of the stack
   return this.each(function(){
     this.parentNode.appendChild(this);
   });

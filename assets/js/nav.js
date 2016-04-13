@@ -1,43 +1,55 @@
 //handles navigation and UI interaction with the base page
-$('.filter-caption').hide();
-$("#extra-bar").hide();
+$('.filter-caption').hide(); //hide the menu button labels to start
+$("#extra-bar").hide(); //hide the filter bar to start
 $(document).ready(function(){
-	$(".menu-icon").mouseover(function(){
-		$(this).css({
-			opacity: 0.5,
-			width: '200%'
-		});
+	//hover functionality for the menu
+	$(".menu-icon").hover(function(){
+		if (!$(this).data('clicked')){
+			$(this).css({
+				opacity: 0.5,
+				width: '200%'
+			});
+		}
 		$(this).find(".filter-caption").show();
-	});
-	$(".menu-icon").mouseout(function(){
-		$(this).css({
-			opacity: 0.25,
-			width: '100%'
-		});
+	}, function(){
+		if (!$(this).data('clicked')){
+			$(this).css({
+				opacity: 0.25,
+				width: '100%'
+			});
+		}
+
 		$(this).find(".filter-caption").hide();
 	});
 	
+	//open the info panel
 	$("#map-window").click(function(){
 		closeInfoWindow();
 	});
 	$(".dis-btn").click(function(){
 		closeInfoWindow();
 	});
-	$(".apply-button").mouseover(function(){
+	$(".apply-button").hover(function(){
 		$(".apply-btn-text").text("Apply Changes");
-	});
-	$(".apply-button").mouseout(function(){
+	}, function(){
 		$(".apply-btn-text").text("");
 	});
 	$(".apply-button").click(function(){
-		//reennable glyph 
 		closeInfoWindow();
 	});
-	
-	$("#help-filter-button").click(function(){
+
+	//open and close the menu icons
+	//I know this doesnt work quite right	
+	$("#help-filter-icon").click(function(){
+		$(this).find(".filter-caption").show();
 		var clicked = $(this).data('clicked');
 		if (!clicked){
+			$(".filter-icon").data('clicked', false)
+			$('.filter-button').css({'width' : '100%'});
 			openInfoWindow();
+			$(this).find(".filter-button").css({
+			'opacity': 1,
+			'width': '100%'});
 			$("#filter-header").text("Welcome to the FEMA Disaster Declaration Portal");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
@@ -49,11 +61,21 @@ $(document).ready(function(){
 		}else{
 			closeInfoWindow();
 			$(this).data('clicked', false);
+			$(this).find(".filter-button").css({
+				'width': '100%'
+			});
+			$(this).find(".filter-caption").hide();
 		}
 	});
-	$("#type-filter-button").click(function(){
+	$("#type-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
+		$(this).find(".filter-caption").show();
 		if (!clicked){
+			$(".filter-button").data('clicked', false);
+			$('.filter-button').css({'width' : '100%'});
+			$(this).find(".filter-button").css({
+			'opacity':1,
+			'width': '100%'});
 			openInfoWindow();
 			$("#filter-header").text("Filter by Disaster Type");
 			//show the filter grid
@@ -64,15 +86,25 @@ $(document).ready(function(){
 			$("#map-settings").hide();
 			$(this).data('clicked', true);
 			$("#extra-bar").css({overflow: 'hidden'});	
+			
 		}else{
 			closeInfoWindow();
 			$(this).data('clicked', false);
+			$(this).find(".filter-button").css({
+			'width': '100%'});
+			$(this).find(".filter-caption").hide();
 		}
 
 	});
-	$("#time-filter-button").click(function(){
+	$("#time-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
+		$(this).find(".filter-caption").show();
 		if (!clicked){
+			$(".filter-button").data('clicked', false);
+			$('.filter-button').css({'width' : '100%'});
+			$(this).find(".filter-button").css({
+			'opacity': 1,
+			'width': '100%'});
 			$("#filter-header").text("Filter by Temporal Range");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").show();
@@ -85,11 +117,20 @@ $(document).ready(function(){
 		}else{
 			closeInfoWindow();
 			$(this).data('clicked', false);
+			$(this).find(".filter-button").css({
+			'width': '100%'});
+			$(this).find(".filter-caption").hide();
 		}
 	});
-	$("#pie-filter-button").click(function(){
+	$("#pie-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
+		$(this).find(".filter-caption").show();
 		if (!clicked){
+			$(".filter-button").data('clicked', false);
+			$('.filter-button').css({'width' : '100%'});
+			$(this).find(".filter-button").css({
+			'opacity': 1,
+			'width': '100%'});
 			$("#filter-header").text("Disaster Breakdown");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
@@ -102,12 +143,21 @@ $(document).ready(function(){
 		}else{
 			closeInfoWindow();
 			$(this).data('clicked', false);
+			$(this).find(".filter-button").css({
+			'width': '100%'});
+			$(this).find(".filter-caption").hide();
 		}
 
 	});
-	$("#settings-filter-button").click(function(){
+	$("#settings-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
+		$(this).find(".filter-caption").show();
 		if (!clicked){
+			$(".filter-button").data('clicked', false);
+			$('.filter-button').css({'width' : '100%'});
+			$(this).find('.filter-button').css({
+			'opacity': 1,
+			'width': '100%'});
 			$("#filter-header").text("Map Settings");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
@@ -120,6 +170,9 @@ $(document).ready(function(){
 		}else{
 			closeInfoWindow();
 			$(this).data('clicked', false);
+			$(this).find(".filter-button").css({
+			'width': '100%'});
+			$(this).find(".filter-caption").hide();
 		}
 
 	});
@@ -138,7 +191,6 @@ $(document).ready(function(){
 	
 	//change geog type in GUI
 	$("input[name=geogType]").on('change', function(){
-		console.log("Changed geography to " + $(this).val());
 		globals.mapConfig.geogType = $(this).val()
 		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData, globals.mapConfig.numClasses);
 	});
@@ -153,7 +205,6 @@ $(document).ready(function(){
 	//and do it if they click on a row of colors too
 	$(".colorSelect").click(function(){
 		var numClasses = +$(this).data('numclasses');
-		console.log("Changing number of classes to " + numClasses);
 		globals.mapConfig.numClasses = numClasses;
 		updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData, globals.mapConfig.numClasses);
 		//set the radio button

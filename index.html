@@ -203,18 +203,54 @@
 					</div>
 				</div>
 				<div id='help'>
-					<p class='help-p'>
-						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					<div class='col-xs-12'>
+					<h5 class='page-header'>What is a FEMA Disaster?</h5>
+					<p class='tip-info'>
+						FEMA is the Federal Emergency Management Agency in the United States. When something goes wrong, from terrorist attacks, to wildfires, to severe winter storms, state governors can request gederal assistance to aid 
+						in damage mititgation and cleanup from FEMA.  This request is made directly to the President of the United States.  Based on the governors request,
+						the president may activate one or more programs that start the flow of federal money into state and local jurisdictions.  For more information about 
+						FEMA, visit <a href='http://www.fema.gov'>FEMA.gov</a>.  For more information about FEMA's open data, visit <a href='http://www.fema.gov/openfema-dataset-disaster-declarations-summaries-v1'>their API.</a>
 					</p>
-					<p class='help-p'>
-						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					<h5 class='page-header'>Why use this application?</h5>
+					<p class='tip-info'>FEMA's open data API provides access to
+						disaster declarations dating back to the early 1960s.  This applications allows users to explore spatial and temporal trends in all disaster declarations over the past fifty years.
+						It also allows users to drill down into the trends of 20 different individual disaster types. The uses for such an application include disaster preparedness planning at a state and federal level,
+						tracking government spending patterns, and tracking climate change perturbations to disaster patterns.</p>
+					<h5 class='page-header'>Help</h5>
+					<h6 class='header'>The Map</h6>
+					<p class='tip-info'>
+						The map shows the spatial trends of the disaster declarations.  Mouse over a county or a state for more information about that geographic unit.
+						The right-hand panel shows the current filters that are being applied to the data.
 					</p>
-					<p class='help-p'>
-						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-					</p>
-					<p class='help-p'>
-						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-					</p>
+					<h6 class='header'>The Menu Bar</h6>
+					<p class='tip-info'>
+						The icon toolbar on the lefthand side of the screen provides access to several important tools that can be used to manipulate and configure the application and its data. The components of the toolbar include:
+						<br /><b>Disaster Selection </b><br />
+						<p class='tip-info'>The disaster selection menu allows you to choose a particular disaster type and to filter to only that type.  Click on a disastert type icon to activate the filter.</p>
+						<br /><b>Temporal Filter </b><br />
+						<p class='tip-info'>The temporal filter allows you to filter the disaster declarations by year and month.  
+							Use the slider bars to configure the temporal filter. 
+							Mouse over the map or the barcharts to show a linked visualization that shows the spatial and temporal patterns of the disasters.</p>
+					<br /><b>Disaster Breakdown</b><br />
+						<p class='tip-info'>The disaster breakdown panel shows the distribution of the disasters currently being shown on the map.  
+							The charts show the percentage of the total disasters currently being shown on the map.  Mouse over the bars for additional information about 
+							each secton of the composition.  The left hand chart shows the contribution of each disaster type to the current configuration. The right hand chart shows the 
+							current distribution of map classes, and is akin to a legend.
+						</p>
+						<br /><b>Map Settings</b><br />
+						<p class='tip-info'>
+							The map settings panel allows you to choose the configuration of the map.  Available configuration options include:<br />
+							(i) Normalization Type: Do you wish to show the raw total number of disaster declarations in each enumeration unit or would you like to show the number of disasters per square kilometer (disasters normalized by area)?
+							<br />
+							(ii) Geography Type: Do you wish to show the map enumerated to states or counties?
+							<br />
+							(iii) Number of classes: How many distinct class breaks do you want to show on the map?
+							<br />
+						</p>
+						<br /><b>Help/Information</b><br />
+						<p>Open this tab again.</p>
+						</p>
+					</div>
 				</div>
 				<div id='map-settings'>
 				<h4 class='header settings-header'>Normalize values by...</h2>
@@ -270,7 +306,6 @@
 	<script src="assets/js/bootstrap.min.js"></script>
 	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>	
 	<script src="assets/js/underscore.js"></script>
-	<script src='assets/js/date.js'></script>
 	<script src="assets/js/d3.min.js"></script>
 	<script src="assets/js/topojson.js"></script>
 	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script> <!--Tooltips-->

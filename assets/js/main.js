@@ -5,20 +5,17 @@
 //	jQuery
 //  d3.js
 // underscore.js
-
-//TODO:
-//automatic scale calculation
-//composition chart
-//update map with colors
-//panel styling
-//legend
-//popup styling
+// d3 tooltip
+// topojson
+//bootsrap
+//jquery UI
 
 
+//for lookup
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var monthAbr = ['Jan', "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
-
+//set and initialize global vars
 var globals = {};
 globals.data = {};
 globals.disasterTypes = []; // a list of all of the types of disasters contained within the dataset
@@ -225,7 +222,7 @@ function loadMapData(){
 //MAP CONTROLS
 
 function updateMapScale(scale){
-		//put the map into a new projection scale
+	//update the map scale --> make it smaller or bigger 
 	var width = $("#map-window").width(),
     height = $("#map-window").height();
     globals.map.height = height;
@@ -248,7 +245,7 @@ function updateMapScale(scale){
 
 function createMap(){
 	//draws a blank map
-	//set props
+	//sets the path and projection functions
 	var width = $("#map-window").width(),
     height = $("#map-window").height();
     globals.map.height = height;
@@ -282,6 +279,7 @@ function createMap(){
 }
 
 function drawGeoUnits(){
+	//draw the geographic units onto the map
 	path = globals.map.path;
 	projection = globals.map.projection;
 	//do the drawing
@@ -319,11 +317,13 @@ function drawGeoUnits(){
 }
 
 function removeGeoUnits(){
+	//remove all geographic units from the map
 	d3.selectAll(".map-unit").remove();
 }
 
 
 function createColorScale(data, numClasses){
+	//create a color scale for use in the choropleth
 	    var colorClasses = chooseColorScheme(numClasses);
 	    //quantiles scale
 	    var colorScale = d3.scale.quantile()
@@ -347,8 +347,6 @@ function updateMap(geographyType, normalizationType, filteredInput, numClasses){
 	//accepts a normalization type of 'Pop', 'Area', or 'None'
 	//function aggreages to the desired geography and then sets the choropleth colors
 	//returns nothing
-	//different breakpoints on the color scale
-	//States isn't working yet
 	try{
 		globals.map.tip.hide(); //make sure its gone
 		d3.select(".d3-tip").remove();
@@ -358,21 +356,24 @@ function updateMap(geographyType, normalizationType, filteredInput, numClasses){
 	
 	
 	 if(geographyType == 'Counties'){
-	 	
+		//do stuff if the enumeration type is states
+		
 	 	//disable the states
 		globals.map.states.style('fill', 'none');
 		globals.map.states.style('stroke', 'none');
 		globals.map.land.style('stroke', 'none');
 		globals.map.land.style('fill', 'none'); 
+		//aggregate the data
 		toMap = aggregateByCounty(filteredInput);
 		globals.map.aggregateData = toMap;
+		//normalize the data
 		if (normalizationType == "Area"){
 			toMap = normalize("Counties", "Area", toMap);
 		}else if (normalizationType == "None"){
 			toMap = normalize("Counties", "None", toMap);
 		}
+		//get the normalized and aggregated data ready to map
 		idToValueMap = {};
-		
 		globals.map.colorScale = createColorScale(toMap, numClasses);
 		//populate the id/value lookup
 	    _.each(toMap, function(d){
@@ -426,14 +427,14 @@ function updateMap(geographyType, normalizationType, filteredInput, numClasses){
 	  	removeHover(d, el, 'map');
 	  });
 	   
-	   	//tooltips //TODO: Change to popup overlay
+	  //tooltip
 	 globals.map.tip = d3.tip()
 	  .attr('class', 'd3-tip')
 	  .offset([-10, 0])
 	  .html(function(d){
 	  	details = getCountyDetails(checkFIPS(d.id));
 	  	try{
-	  		val = globals.map.aggregateData[checkFIPS(d.id)].length
+	  		val = globals.map.aggregateData[checkFIPS(d.id)].length;
 	  	}catch(err){
 	  		val = 0
 	  	}
@@ -447,6 +448,7 @@ function updateMap(geographyType, normalizationType, filteredInput, numClasses){
 	  globals.map.canvas.call(globals.map.tip);//enable the tooltip
 	} // end counties block
 	else if (geographyType == "States"){
+		//enumeration unit is States
 		d3.select(".d3-tip").remove();
 		//disable the counties
 		globals.map.counties.style('fill', 'none');
@@ -536,6 +538,7 @@ function updateMap(geographyType, normalizationType, filteredInput, numClasses){
 	  globals.map.canvas.call(globals.map.tip);//enable the tooltip
 	}//end states block
 	
+	//do aggregation for use in the barchart coordinated viz
 	globals.filteredData = filteredInput
 	globals.monthlyAggregate = aggregateByMonth(filteredInput);
 	globals.yearlyAggregate = aggregateByYear(filteredInput);
@@ -601,7 +604,7 @@ function buildBarCharts(){
 	    .orient("left");
 	    
 
-	
+	//set scale
 	globals.barcharts.monthX.domain(monthData.map(function(d) { 
 		return d.month.toString(); }));
   	globals.barcharts.monthY.domain([0, d3.max(monthData, function(d) {
@@ -640,6 +643,7 @@ function buildBarCharts(){
       
       //////////////
       	//Years
+      	//looks very similar to months but calls different functions
 	globals.barcharts.yearBarCanvas = d3.select("#yearBarChart").append('svg')
 		.attr('height', globals.barcharts.height + globals.barcharts.margins.top + globals.barcharts.margins.bottom)
 		.attr('width', globals.barcharts.width + globals.barcharts.margins.left + globals.barcharts.margins.right)
@@ -701,8 +705,6 @@ function buildBarCharts(){
 
 function updateBarCharts(data, temporalFilter){
 	//this actually just draws a new bar chart over the existing one with the temporal filter applied.  Uses the same scales
-
-
 	globals.barcharts.yearBarCanvas.selectAll(".update-bar")
 		.remove() // clear the old stuff
 	
@@ -829,6 +831,7 @@ function chooseColorScheme(numClasses){
 }
 
 function createBreakdownCharts(){
+	//creates stacked bars showing the legend and the contribution of each disaster type
 	var margin = {top: 30, right: 20, bottom: 100, left: 40};
 	var height = 700 - margin.top - margin.bottom; //these are static because they collapse and its annoying-- TODO fix;
 	var width = 300 - margin.left - margin.right;
@@ -859,7 +862,7 @@ function createBreakdownCharts(){
 		      .text("% of Total");
 	globals.breakdown.y = y;
 	
-	globals.breakdown.typeColors = d3.scale.category20();
+	globals.breakdown.typeColors = d3.scale.category20b();
 }
 
 function updateBreakdownCharts(data){
@@ -986,6 +989,7 @@ function populateColorSelect(){
 }
 
 function coordinateHover(d, el, origin){
+	//this is the coordianted hover visualization function
 	el.style({
 		'stroke': 'black',
 		'stroke-opacity':1,
@@ -1061,6 +1065,7 @@ function highlightMap(thisDisaster){
 
 
 function removeHover(d, el){
+	//removes the coordinated hover from the counties, states, and bars
 	d3.selectAll(".counties")
 		.style("stroke", 'white')
 		.style("stroke-opacity", 0.25)
