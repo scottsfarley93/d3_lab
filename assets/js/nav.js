@@ -160,6 +160,69 @@ $(document).ready(function(){
 		$(this).find("input").prop('checked', true);
 	});
 	
+	//control double-sliders
+		//tooltips for temporal sliders
+		var tooltip = $('<div id="tooltip" />').css({
+		    position: 'absolute',
+		    top: -25,
+		    left: -10
+		}).hide();
+	//month
+	    $( "#month-range" ).slider({
+	      range: true,
+	      min: 1,
+	      max: 12,
+	      values: [ 1, 12 ],
+	      stop: function( event, ui ) {
+	        globals.temporalFilter.maxMonth = ui.values[1];
+	        globals.temporalFilter.minMonth = ui.values[0];
+	        configureTimeFilter(globals.temporalFilter);
+	       	$(this).children('.ui-slider-handle').first().text("").fadeIn(100);
+	      	$(this).children('.ui-slider-handle').last().text("").fadeIn(100);
+	      },
+	      slide: function(event, ui){
+	      	 $(this).children('.ui-slider-handle').first().text(months[ui.values[0]]);
+	      	 $(this).children('.ui-slider-handle').last().text(months[ui.values[1]]);
+	      }
+	    });
+	  //year
+	 $(function() {
+	    $( "#year-range" ).slider({
+	      range: true,
+	      min: 1960,
+	      max: 2016,
+	      values: [ 1960, 2016 ],
+	      stop: function( event, ui ) {
+	        globals.temporalFilter.maxYear = ui.values[1];
+	        globals.temporalFilter.minYear = ui.values[0];
+	        configureTimeFilter(globals.temporalFilter);
+	       	$(this).children('.ui-slider-handle').first().text("").fadeIn(100);
+	      	$(this).children('.ui-slider-handle').last().text("").fadeIn(100);
+	      },
+	      slide: function(event, ui){
+	      	 $(this).children('.ui-slider-handle').first().text(ui.values[0]);
+	      	  $(this).children('.ui-slider-handle').last().text(ui.values[1]);
+	      }
+	    });
+	 
+	  });
+	
+	//the time slider should be as width as the bar charts
+	$("#year-range").width($(".temporal-bar").width());
+	$("#month-range").width($(".temporal-bar").width());
+	//make sure the bars start where the cols do
+	$("#year-range").css({
+		'margin-left':45 + "px",
+		'margin-right': $(this).width()*0.01 + 'px' //not perfect but close
+	});
+	$("#month-range").css({
+		'margin-left':45 + "px",
+		'margin-right': $(this).width()*0.01 + 'px'
+	});
+	
+
+
+
 });//end doc ready fn
 
 //resize map on extra bar open
@@ -167,10 +230,12 @@ function closeInfoWindow(){
 	$("#extra-bar").hide();
 	$("#map-window").addClass("col-xs-11").removeClass('col-xs-7');
 	$(".filter-button").data('clicked', false);
+	updateMapScale(1000)//change the map to be bigger when there is not an info window
 }
 function openInfoWindow(){
 	//$("#disaster-grid").hide() //hide on open so it only shows when we call it
 	$("#extra-bar").show();
 	$("#map-window").addClass("col-xs-7").removeClass('col-xs-11');
+	updateMapScale(750) //change the map to be smaller when the info window is open
 }
 

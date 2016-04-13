@@ -19,6 +19,7 @@
 		<!-- Optional theme -->
 		<link rel="stylesheet" href="assets/css/bootstrap-theme.min.css">
 		<link rel="stylesheet" href="assets/css/style.css">
+		  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	</head>
 
 	<body>
@@ -181,8 +182,8 @@
 					</h2>
 					<div id='yearFilter col-xs-12'>
 						<div id='yearBarChart' class='temporalBar col-xs-12'></div>
-						<span>Min Year: </span><span id='minYearText'>1960</span><input class='temporalSlider' type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input class='temporalSlider' type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
-					</div>
+						<div id="year-range" ></div><br />
+						</div>
 				</div>
 				<div id='month-filter-holder' class='temporal-filter-holder col-xs-12'>
 					<h4 id='monthFilter' class='header'>
@@ -190,7 +191,7 @@
 					</h2>
 					<div id='monthFilter' class='col-xs-12'>
 						<div id='monthBarChart' class='temporalBar col-xs-12'></div>
-						<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' class='temporalSlider' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input class='temporalSlider' type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
+						<div id="month-range"></div><br />
 					</div>
 				<button class='btn btn-default apply-button'><span class='apply-btn-text'></span><span class='glyphicon glyphicon-check'></span></button>
 				</div>
@@ -216,26 +217,30 @@
 					</p>
 				</div>
 				<div id='map-settings'>
-				<h4 class='header'>Data Normalization</h2>
+				<h4 class='header settings-header'>Normalize values by...</h2>
 					<div class='settings-holder'>
-					<label>Raw</label><input name='normType' value='None' type='radio' checked/><br />
-					<label>Area (Disasters / km<sup>2</sup>)</label><input name='normType' value='Area' type='radio'/>
+						<table>
+					<tr><td><input name='normType' value='None' type='radio' checked/></td><td><label>Total Number</label></td></tr>
+					<tr><td><input name='normType' value='Area' type='radio'/></td><td><label>Area (Disasters / km<sup>2</sup>)</label></td></tr>
+				</table>
 				</div>
-				<h4 class='header'>Geography Type</h2>
+				<h4 class='header settings-header'>Show...</h2>
 				<div class='settings-holder'>
-					<label>Counties</label><input name='geogType' value='Counties' type='radio' checked/><br />
-					<label>States</label><input name='geogType' value='States' type='radio'/>
+					<table>
+					<tr><td><input name='geogType' value='Counties' type='radio' checked/></td><td><label>Counties</label></td></tr>
+					<tr><td><input name='geogType' value='States' type='radio'/><td><label>States</label></td></td></tr>
+					</table>
 				</div>
-				<h4 class='header'>Map Classes</h2>
+				<h4 class='header settings-header'>Reclassify the map...</h2>
 				<div class='settings-holder'>
 					
 					<table id='classTable'>
-					<tr id='colorSelect2' data-numClasses='2' class='colorSelect'><td><input name='numClasses' value='2' type='radio'/><label>Two</label></td></tr>
-					<tr id='colorSelect3' data-numClasses='3' class='colorSelect'><td><input name='numClasses' value='3' type='radio'/><label>Three</label></td></tr>
-					<tr id='colorSelect4' data-numClasses='4' class='colorSelect'><td><input name='numClasses' value='4' type='radio'/><label>Four</label></td></tr>
-					<tr id='colorSelect5' data-numClasses='5' class='colorSelect'><td><input name='numClasses' value='5' type='radio' checked/><label>Five</label></td></tr>
-					<tr id='colorSelect6' data-numClasses='6' class='colorSelect'><td><input name='numClasses' value='6' type='radio'/><label>Six</label></td></tr>
-					<tr id='colorSelect7' data-numClasses='7' class='colorSelect'><td><input name='numClasses' value='7' type='radio'/><label>Seven</label></td></tr>
+					<tr id='colorSelect2' data-numClasses='2' class='colorSelect'><td><input name='numClasses' value='2' type='radio'/><label>Two Classes</label></td></tr>
+					<tr id='colorSelect3' data-numClasses='3' class='colorSelect'><td><input name='numClasses' value='3' type='radio'/><label>Three Classes</label></td></tr>
+					<tr id='colorSelect4' data-numClasses='4' class='colorSelect'><td><input name='numClasses' value='4' type='radio'/><label>Four Classes</label></td></tr>
+					<tr id='colorSelect5' data-numClasses='5' class='colorSelect'><td><input name='numClasses' value='5' type='radio' checked/><label>Five Classes</label></td></tr>
+					<tr id='colorSelect6' data-numClasses='6' class='colorSelect'><td><input name='numClasses' value='6' type='radio'/><label>Six Classes</label></td></tr>
+					<tr id='colorSelect7' data-numClasses='7' class='colorSelect'><td><input name='numClasses' value='7' type='radio'/><label>Seven Classes</label></td></tr>
 					</table>
 				</div>
 				<button class='btn btn-default apply-button'><span class='apply-btn-text'></span><span class='glyphicon glyphicon-check'></span></button>
@@ -250,10 +255,10 @@
 			
 		<div id='header-info'>
 					<h3 class='page-header' id='dis-title'>All Disasters</h3>
-					<label>Years: </label><span class='text-muted' id='yearRange'></span><br />
-					<label>Months: </label><span class='text-muted' id='monthRange'></span><br />
-					<label>Historic Total: </label><span class='text-muted' id='currentNumDisasters'></span><br />
-					<label>Percent of All Disasters: </label><span class='text-muted' id='percentTotal'></span><br />
+					<label>Years: </label><span class='text-muted minYearText tip-info'>1960</span> to <span class='text-muted tip-info maxYearText'>2016</span><br />
+					<label>Months: </label><span class='text-muted minMonthText tip-info'>January</span> to <span class='text-muted maxMonthText tip-info'>December</span><br />
+					<label>Historic Total: </label><span class='text-muted tip-info' id='currentNumDisasters'></span><br />
+					<label>Percent of All Disasters: </label><span class='text-muted tip-info' id='percentTotal'></span><br />
 	</div> <!--end of header-->
 
     
@@ -262,7 +267,8 @@
 		
 	<!-- Load external javascript files-->
 	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/bootstrap.min.js"></script>	
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>	
 	<script src="assets/js/underscore.js"></script>
 	<script src='assets/js/date.js'></script>
 	<script src="assets/js/d3.min.js"></script>
