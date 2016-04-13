@@ -205,7 +205,7 @@ function displayMapTotal(input){
 	//displays the total number of disasters on the map at this point in time
 	//map always shows filteredData
 	 l = input.length;
-	$("#currentNumDisasters").text(l);
+	$("#currentNumDisasters").text(formatNumber(l));
 	globals.currentTotal = l
 }
 
@@ -321,3 +321,111 @@ function normalize(geographyType, normalizationType, inputObject){
 function clearMap(){
 	$("#map").empty();
 }
+
+function aggregateByMapClass(data, colorArray){
+	//aggregates so we know how many enum units are in each map class --> used to create a legend
+	data = aggregateByCounty(data);
+	comp = []
+	var numTotal;
+	if (globals.mapConfig.geogType == 'States'){
+		for (var i=0; i < globals.map.states[0].length; i++){
+			state = d3.select(globals.map.states[0][i]);
+			fillColor = state.style('fill');
+			num = state.attr('numDis');
+			obj = {"numDis": num, 'fill': fillColor};
+			comp.push(obj);
+		}
+		numTotal = globals.map.states[0].length;
+	}else if (globals.mapConfig.geogType == "Counties"){
+		for (var i=0; i < globals.map.counties[0].length; i++){
+			county = d3.select(globals.map.counties[0][i]);
+			fillColor = county.style('fill');
+			num = county.attr('numDis');
+			obj = {"numDis": num, 'fill': fillColor};
+			comp.push(obj);
+		}
+		numTotal = globals.map.counties[0].length;
+	}
+	
+	//find the counts
+	groups = _.groupBy(comp, function(d){
+		return d.fill;
+	})
+	out = []
+	//find the details
+	for (color in groups){
+		g = groups[color]
+		num = g.length;
+		pct = (num / numTotal) * 100;
+		classMin = _.min(g, function(d){
+			return +d.numDis;
+		});
+		classMin = +classMin.numDis;
+		classMax = _.max(g, function(d){
+			return +d.numDis;
+		});
+		classMax = +classMax.numDis;
+		out.push({numInClass: num, classMax: classMax, classMin: classMin, percent: pct, color: color});
+		offset += pct;
+	}
+	out = _.sortBy(out, function(d){
+		return d.classMax;
+	});
+	//finally, find the offset
+	var offset = 0;
+	for (var i=0; i< out.length;i++){
+		itemPct = +out[i]['percent'];
+		out[i]['offset'] = offset;
+		offset = offset + itemPct;
+		out[i]['position'] = i ;
+	}
+	return out;
+}
+
+function convertAggregateToPercent(inputAgg, total){
+	data = _.map(inputAgg, function(value, key, list){
+		return {type: key, percent: (value.length / total) * 100};
+	});
+	data = _.sortBy(data, function(d){return d.percent;});
+	offset = 0;
+	for (var i = 0; i<data.length; i++){
+		item = data[i];
+		item['offset'] = offset;
+		offset = item['percent'] + offset;
+	}
+	return data;
+}
+
+
+/// Handle window resize
+function onResize(){
+	//on document resize
+	clearMap();
+	createMap();
+	updateMap(globals.mapConfig.geogType, globals.mapConfig.normType, globals.filteredData, globals.map.numClasses);	
+}
+
+function round2(num){
+	//rounds to at most two decimal places
+	return Math.round(num * 100) / 100;
+}
+function formatNumber(num){
+	//formats a long number with a comma 1,000,000
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+
+d3.selection.prototype.moveToFront = function() {  
+	//allows you to bring an enumeration unit to the front of the stack
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+d3.selection.prototype.moveToBack = function() {  
+    return this.each(function() { 
+        var firstChild = this.parentNode.firstChild; 
+        if (firstChild) { 
+            this.parentNode.insertBefore(this, firstChild); 
+        } 
+    });
+};

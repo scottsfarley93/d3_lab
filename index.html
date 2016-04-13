@@ -19,226 +19,298 @@
 		<!-- Optional theme -->
 		<link rel="stylesheet" href="assets/css/bootstrap-theme.min.css">
 		<link rel="stylesheet" href="assets/css/style.css">
+		  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	</head>
 
 	<body>
 		
-
-    
-		<div id='main' class='col-sm-12 col-xs-12'>
-			<div class='col-sm-3 col-xs-12' id='filterControls'>
-							<h2 class='page-header header col-xs-12' id='dis-title'>
-					All Disasters
-				</h2> 
-			<div class="dropdown">
-		  <button class="btn btn-default dropdown-toggle btn-lrg col-xs-12" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-		    <label>Filter</label><img id='filter-img' src="assets/img/thumbs/filter.svg"/>
-		  </button>
-				<!--Diaster Icon Grid--->
-				  <div class="dropdown-menu dropdown-menu-right col-xs-offset-4 col-xs-2" aria-labelledby="dropdownMenu1">
+		
+		<div id='main' class='col-xs-12'>
+			<div id='bars' class='col-xs-1'>
+			<div id='filter-bar' class='col-xs-6'>
+				<div id='type-filter-icon' class='menu-icon'>
+					<button id='type-filter-button' class='filter-button' data-clicked='false'>
+						<label class='caption filter-caption' id='type-caption'>
+							Disaster Type
+						</label>
+						<img src='assets/img/thumbs/all.svg'/>
+					</button>
+				</div>
+				<div id='time-filter-icon' class='menu-icon'>
+		
+					<button id='time-filter-button' class='filter-button' data-clicked='false'>
+							<label class='caption filter-caption' id='temporal-caption'>
+							Temporal Range
+						</label>
+						<img src='assets/img/thumbs/time.svg'/>
+					</button>
+				</div>
+				<div id='pie-filter-icon' class='menu-icon'>
+					<button id='pie-filter-button' class='filter-button' data-clicked='false'>
+						<label class='caption filter-caption' id='breakdown-caption'>
+							Breakdown
+						</label>
+						<img src='assets/img/thumbs/pie.svg'/>						
+					</button>
+				</div>				
+				<div id='settings-filter-icon' class='menu-icon'>
+					<button id='settings-filter-button' class='filter-button' data-clicked='false'>
+							<label class='caption filter-caption' id='breakdown-caption'>
+							Map Settings
+						</label>
+						<img src='assets/img/thumbs/settings.svg'/>
+						
+					</button>
+				</div>
+				<div id='help-filter-icon' class='menu-icon'>
+					<button id='help-filter-button' class='filter-button' data-clicked='false'>
+						<label class='caption filter-caption' id='help-caption'>
+							Help
+						</label>
+						<img src='assets/img/thumbs/help.svg'/>
+					</button>
+				</div>
+			</div><!--End filter bar-->
+			</div>
+			<div id='extra-bar' class='col-xs-4'>
+				<!-- extra information goes here-->
+				<h2 class='page-header' id='filter-header'>Filter Header</h2>
+				<div class='col-xs-11' id='disaster-grid'>
 					<div class='row'>
-						<div id='icon1' class='col-xs-2'>
+						<div id='icon1' class='col-xs-3 filter-icon'>
 							<button class='btn dis-btn' id='btn1' data-type='Coastal Storm'></button>
 							<label class='caption'>Coastal<br />Storm</label>
 						</div>
-						<div id='icon2 ' class='col-xs-2'>
+						<div id='icon2 ' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn2' data-type='Dam/Levee Break'></button>
 							<label  class='caption'>Dam Failure</label>
 						</div>
-						<div id='icon3' class='col-xs-2' align="center">
+						<div id='icon3' class='col-xs-3 filter-icon' align="center">
 							<button class='btn  dis-btn' id='btn3' data-type='Drought'></button>
 							<label  class='caption'>Drought</label>
 						</div>
-						<div id='icon4' class='col-xs-2' align='center'>
+						<div id='icon4' class='col-xs-3 filter-icon' align='center'>
 							<button class='btn  dis-btn' id='btn4' data-type='Fire'></button>
 							<label  class='caption'>Fire</label>
 						</div>
 					</div>
 					<div class='row'>
-						<div id='icon7' class='col-xs-2'>
+						<div id='icon7' class='col-xs-3 filter-icon '>
 							<button class='btn  dis-btn' id='btn7' data-type='Freezing'></button>
 							<label  class='caption'>Freezing</label>
 						</div>
-						<div id='icon8' class='col-xs-2'>
+						<div id='icon8' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn8' data-type='Hurricane'></button>
 							<label  class='caption'>Hurricane</label>
 						</div>
-						<div id='icon9' class='col-xs-2'>
+						<div id='icon9' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn9' data-type='Human Cause'></button>
 							<label  class='caption'>Human Caused</label>
 						</div>
-						<div id='icon10' class='col-xs-2'>
+						<div id='icon10' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn10' data-type='Severe Ice Storm'></button>
 							<label  class='caption'>Severe Ice Storm</label>
 						</div>
 					</div>
 					<div id='row3' class='row'>
-						<div id='icon13' class='col-xs-2'>
+						<div id='icon13' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn13' data-type='Severe Storm(s)'></button>
 							<label  class='caption'>Severe Storm</label>
 						</div>
-						<div id='icon14' class='col-xs-2'>
+						<div id='icon14' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn14' data-type='Terrorist'></button>
 							<label  class='caption'>Terrorist</label>
 						</div>
-						<div id='icon15' class='col-xs-2'>
+						<div id='icon15' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn15' data-type='Tornado'></button>
 							<label  class='caption'>Tornado</label>
 						</div>
-						<div id='icon16' class='col-xs-2'>
+						<div id='icon16' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn16' data-type='Toxic Substances'></button>
 							<label  class='caption'>Toxic Substances</label>
 						</div>
 						
 					</div>
 					<div class='row'>
-					<div id='icon19' class='col-xs-2'>
+					<div id='icon19' class='col-xs-3 filter-icon'>
 						<button class='btn  dis-btn' id='btn19' data-type='Volcano'></button>
 						<label  class='caption'>Volcano</label>
 					</div>
-						<div id='icon20' class='col-xs-2'>
+						<div id='icon20' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn20' data-type='Chemical'></button>
 							<label  class='caption'>Chemical Spill</label>
 						</div>
-						<div id='icon5' class='col-xs-2'>
+						<div id='icon5' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn5' data-type='Fishing Losses'></button>
 							<label  class='caption'>Fishing Losses</label>
 						</div>
-						<div id='icon6' class='col-xs-2'>
+						<div id='icon6' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn6' data-type='Flood'></button>
 							<label  class='caption'>Flood</label>
 						</div>
 					</div>
 					<div class='row'>
-						<div id='icon17' class='col-xs-2'>
+						<div id='icon17' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn17' data-type='Tsunami'></button>
 							<label  class='caption'>Tsunami</label>
 						</div>
-						<div id='icon18' class='col-xs-2'>
+						<div id='icon18' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn18' data-type='Typhoon'></button>
 							<label  class='caption'>Typhoon</label>
 						</div>		
-						<div id='icon11' class='col-xs-2' data-type='Landslide/Mudslide'>
+						<div id='icon11' class='col-xs-3 filter-icon' data-type='Landslide/Mudslide'>
 							<button class='btn  dis-btn'  id='btn11'></button>
 							<label  class='caption'>Landslide</label>
 						</div>
-						<div id='icon12' class='col-xs-2'>
+						<div id='icon12' class='col-xs-3 filter-icon'>
 							<button class='btn  dis-btn' id='btn12' data-type='Nsow'></button>
 							<label  class='caption'>Snow</label>
 						</div>	
 					</div>
 					<hr />
 					<div class='row'>
-						<div id='allIcon' class='col-xs-2 col-xs-offset-2'>
+						<div id='allIcon' class='col-xs-4 col-xs-offset-4 filter-icon'>
 							<button class='btn  dis-btn' id='btn21' data-type='All Disasters'></button>
 							<label class='caption'>All<br />Disasters</label>
 						</div> 
-						<div id='compIcon' class='col-xs-2'>
-							<button class='btn  dis-btn' id='btn22' data-type='Composite'></button>
-							<label class='caption'>Calculate<br />Composite</label>
-						</div> 
 					</div>
+				</div><!--end dis grid-->
+				<div class='col-xs-11' id='temporal-filters'>
+					<div id='year-filter-holder' class='temporal-filter-holder col-xs-12'>
+					<h4 class='header'>
+						Filter by Year
+					</h2>
+					<div id='yearFilter col-xs-12'>
+						<div id='yearBarChart' class='temporalBar col-xs-12'></div>
+						<div id="year-range" ></div><br />
+						</div>
+				</div>
+				<div id='month-filter-holder' class='temporal-filter-holder col-xs-12'>
+					<h4 id='monthFilter' class='header'>
+						Filter by Month
+					</h2>
+					<div id='monthFilter' class='col-xs-12'>
+						<div id='monthBarChart' class='temporalBar col-xs-12'></div>
+						<div id="month-range"></div><br />
+					</div>
+				<button class='btn btn-default apply-button'><span class='apply-btn-text'></span><span class='glyphicon glyphicon-check'></span></button>
+				</div>
+				
+				</div><!--end temporal filters-->
+				<div id='breakdown' class='col-xs-11'>
+					<div id='breakdownCharts' class='col-xs-12'>
+						
+					</div>
+				</div>
+				<div id='help'>
+					<div class='col-xs-12'>
+					<h5 class='page-header'>What is a FEMA Disaster?</h5>
+					<p class='tip-info'>
+						FEMA is the Federal Emergency Management Agency in the United States. When something goes wrong, from terrorist attacks, to wildfires, to severe winter storms, state governors can request gederal assistance to aid 
+						in damage mititgation and cleanup from FEMA.  This request is made directly to the President of the United States.  Based on the governors request,
+						the president may activate one or more programs that start the flow of federal money into state and local jurisdictions.  For more information about 
+						FEMA, visit <a href='http://www.fema.gov'>FEMA.gov</a>.  For more information about FEMA's open data, visit <a href='http://www.fema.gov/openfema-dataset-disaster-declarations-summaries-v1'>their API.</a>
+					</p>
+					<h5 class='page-header'>Why use this application?</h5>
+					<p class='tip-info'>FEMA's open data API provides access to
+						disaster declarations dating back to the early 1960s.  This applications allows users to explore spatial and temporal trends in all disaster declarations over the past fifty years.
+						It also allows users to drill down into the trends of 20 different individual disaster types. The uses for such an application include disaster preparedness planning at a state and federal level,
+						tracking government spending patterns, and tracking climate change perturbations to disaster patterns.</p>
+					<h5 class='page-header'>Help</h5>
+					<h6 class='header'>The Map</h6>
+					<p class='tip-info'>
+						The map shows the spatial trends of the disaster declarations.  Mouse over a county or a state for more information about that geographic unit.
+						The right-hand panel shows the current filters that are being applied to the data.
+					</p>
+					<h6 class='header'>The Menu Bar</h6>
+					<p class='tip-info'>
+						The icon toolbar on the lefthand side of the screen provides access to several important tools that can be used to manipulate and configure the application and its data. The components of the toolbar include:
+						<br /><b>Disaster Selection </b><br />
+						<p class='tip-info'>The disaster selection menu allows you to choose a particular disaster type and to filter to only that type.  Click on a disastert type icon to activate the filter.</p>
+						<br /><b>Temporal Filter </b><br />
+						<p class='tip-info'>The temporal filter allows you to filter the disaster declarations by year and month.  
+							Use the slider bars to configure the temporal filter. 
+							Mouse over the map or the barcharts to show a linked visualization that shows the spatial and temporal patterns of the disasters.</p>
+					<br /><b>Disaster Breakdown</b><br />
+						<p class='tip-info'>The disaster breakdown panel shows the distribution of the disasters currently being shown on the map.  
+							The charts show the percentage of the total disasters currently being shown on the map.  Mouse over the bars for additional information about 
+							each secton of the composition.  The left hand chart shows the contribution of each disaster type to the current configuration. The right hand chart shows the 
+							current distribution of map classes, and is akin to a legend.
+						</p>
+						<br /><b>Map Settings</b><br />
+						<p class='tip-info'>
+							The map settings panel allows you to choose the configuration of the map.  Available configuration options include:<br />
+							(i) Normalization Type: Do you wish to show the raw total number of disaster declarations in each enumeration unit or would you like to show the number of disasters per square kilometer (disasters normalized by area)?
+							<br />
+							(ii) Geography Type: Do you wish to show the map enumerated to states or counties?
+							<br />
+							(iii) Number of classes: How many distinct class breaks do you want to show on the map?
+							<br />
+						</p>
+						<br /><b>Help/Information</b><br />
+						<p>Open this tab again.</p>
+						</p>
+					</div>
+				</div>
+				<div id='map-settings'>
+				<h4 class='header settings-header'>Normalize values by...</h2>
+					<div class='settings-holder'>
+						<table>
+					<tr><td><input name='normType' value='None' type='radio' checked/></td><td><label>Total Number</label></td></tr>
+					<tr><td><input name='normType' value='Area' type='radio'/></td><td><label>Area (Disasters / km<sup>2</sup>)</label></td></tr>
+				</table>
+				</div>
+				<h4 class='header settings-header'>Show...</h2>
+				<div class='settings-holder'>
+					<table>
+					<tr><td><input name='geogType' value='Counties' type='radio' checked/></td><td><label>Counties</label></td></tr>
+					<tr><td><input name='geogType' value='States' type='radio'/><td><label>States</label></td></td></tr>
+					</table>
+				</div>
+				<h4 class='header settings-header'>Reclassify the map...</h2>
+				<div class='settings-holder'>
+					
+					<table id='classTable'>
+					<tr id='colorSelect2' data-numClasses='2' class='colorSelect'><td><input name='numClasses' value='2' type='radio'/><label>Two Classes</label></td></tr>
+					<tr id='colorSelect3' data-numClasses='3' class='colorSelect'><td><input name='numClasses' value='3' type='radio'/><label>Three Classes</label></td></tr>
+					<tr id='colorSelect4' data-numClasses='4' class='colorSelect'><td><input name='numClasses' value='4' type='radio'/><label>Four Classes</label></td></tr>
+					<tr id='colorSelect5' data-numClasses='5' class='colorSelect'><td><input name='numClasses' value='5' type='radio' checked/><label>Five Classes</label></td></tr>
+					<tr id='colorSelect6' data-numClasses='6' class='colorSelect'><td><input name='numClasses' value='6' type='radio'/><label>Six Classes</label></td></tr>
+					<tr id='colorSelect7' data-numClasses='7' class='colorSelect'><td><input name='numClasses' value='7' type='radio'/><label>Seven Classes</label></td></tr>
+					</table>
+				</div>
+				<button class='btn btn-default apply-button'><span class='apply-btn-text'></span><span class='glyphicon glyphicon-check'></span></button>
+				</div>
+			</div> <!--end extra bar-->
+				  
+				  <div id='map-window' class='col-xs-11'>
+				  	
 				  </div>
-				</div>
-				
-				<label>Historic Total: </label><span class='text-muted' id='currentNumDisasters'></span><br />
-				<label>Percent of Total: </label><span class='text-muted' id='percentTotal'></span><br />
-				
-				
-				
-				<h2 class='page-header'>
-					Filter by Year
-				</h2>
-				<div id='yearFilter'>
-					<div id='yearBarChart' class='temporalBar'></div>
-					<span>Min Year: </span><span id='minYearText'>1960</span><input class='temporalSlider' type='range' min='1960' max='2016' value='1960' id='yearSliderMin'/><span>Max Year: </span><span id='maxYearText'>2016</span> <input class='temporalSlider' type='range' min='1960' max='2016' value='2016' id='yearSliderMax'/><br/>
-				</div>
-				<h2 id='monthFilter'>
-					Filter by Month
-				</h2>
-				<div id='monthFilter'>
-					<div id='monthBarChart' class='temporalBar'></div>
-					<span>Min Month: </span><span id='minMonthText'>1</span><input type='range' class='temporalSlider' min='1' max='12' value="1" id='monthSliderMin'/><span>Max Month: </span><span id='maxMonthText'>12</span><input class='temporalSlider' type='range' min='1' max='12' value="12" id='monthSliderMax'/><br />
-				</div>
-				
-			<h2>Data Normalization</h2>
-			<label>Raw</label><input name='normType' value='None' type='radio' checked/><br />
-			<label>Area (Disasters / km<sup>2</sup>)</label><input name='normType' value='Area' type='radio'/>
 			
-			<h2>Geography Type</h2>
-			<label>Counties</label><input name='geogType' value='Counties' type='radio' checked/><br />
-			<label>States</label><input name='geogType' value='States' type='radio'/>
-		
-			</div> <!-- end filter controls-->
 			
-			<div class='col-sm-9 col-xs-12' id='infoViz'>
-				<div id='map'></div>
-				<div id='bottomBar' class='row'>
-					<div id='typeChartHolder' class='col-sm-6'>
-						<label>Type Breakdown</label>
-						<!--type pie chart goes here-->
-					</div>
-				</div>
-			</div> <!-- this is the map-->
 			
-		</div> <!-- end main row-->
-		
-		
-		
-		<!--- MODALS -->
-		<!-- INFORMATION OPEN ON INIT AND ON ABOUT CLICK -->
-				<!-- Modal -->
-		<div id="startModal" class="modal fade" role="dialog">
-		  <div class="modal-dialog modal-lg">
-		
-		    <!-- Modal content-->
-		    <div class="modal-content">
+		<div id='header-info'>
+					<h3 class='page-header' id='dis-title'>All Disasters</h3>
+					<label>Years: </label><span class='text-muted minYearText tip-info'>1960</span> to <span class='text-muted tip-info maxYearText'>2016</span><br />
+					<label>Months: </label><span class='text-muted minMonthText tip-info'>January</span> to <span class='text-muted maxMonthText tip-info'>December</span><br />
+					<label>Historic Total: </label><span class='text-muted tip-info' id='currentNumDisasters'></span><br />
+					<label>Percent of All Disasters: </label><span class='text-muted tip-info' id='percentTotal'></span><br />
+	</div> <!--end of header-->
 
-		      <div class="modal-body"> <button type="button" class="close" data-dismiss="modal">&times;</button>
-		      	<p align='center'>text goes here</p>
-      </div>
-      <hr />
-      <div id='footerRow'>
-   		     <h5>Design and Implementation</h5> <br />
-		     <span class='text-muted'>Scott Farley | <a href='http://scottsfarley.com'>scottsfarley.com</a></span>
-	</div>
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
-		
-		  </div>
-		</div>
-		
-		<!-- Create a new composite -->
-		<!-- Modal -->
-		<div id="startModal" class="modal fade" role="dialog">
-		  <div class="modal-dialog modal-lg">
-		
-		    <!-- Modal content-->
-		    <div class="modal-content">
-
-		      <div class="modal-body" id='composite-modal'> <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <hr />
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
-		
-		  </div>
-		</div>
+    
+			
 	
 		
 	<!-- Load external javascript files-->
 	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/bootstrap.min.js"></script>	
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>	
 	<script src="assets/js/underscore.js"></script>
-	<script src='assets/js/date.js'></script>
 	<script src="assets/js/d3.min.js"></script>
 	<script src="assets/js/topojson.js"></script>
 	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script> <!--Tooltips-->
 	<script src='assets/js/app_utils.js'></script>
 	<script src='assets/js/main.js'></script>
+	<script src='assets/js/nav.js'></script>
 	</body>
 </html>
