@@ -347,3 +347,10 @@ html, body, #main{
 	z-index: 10001;
 	position: absolute;
 }
+
+.open{
+	width: 200%;
+}
+.closed{
+	width: 100%;
+}

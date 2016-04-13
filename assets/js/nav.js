@@ -4,21 +4,10 @@ $("#extra-bar").hide(); //hide the filter bar to start
 $(document).ready(function(){
 	//hover functionality for the menu
 	$(".menu-icon").hover(function(){
-		if (!$(this).data('clicked')){
-			$(this).css({
-				opacity: 0.5,
-				width: '200%'
-			});
-		}
+			$(this).toggleClass('open')
 		$(this).find(".filter-caption").show();
 	}, function(){
-		if (!$(this).data('clicked')){
-			$(this).css({
-				opacity: 0.25,
-				width: '100%'
-			});
-		}
-
+			$(this).toggleClass('open')
 		$(this).find(".filter-caption").hide();
 	});
 	
@@ -43,13 +32,11 @@ $(document).ready(function(){
 	$("#help-filter-icon").click(function(){
 		$(this).find(".filter-caption").show();
 		var clicked = $(this).data('clicked');
+		$(".menu-icon").removeClass('open');
 		if (!clicked){
-			$(".filter-icon").data('clicked', false)
-			$('.filter-button').css({'width' : '100%'});
+			$(this).addClass('open');
+			$(".menu-icon").data('clicked', false);
 			openInfoWindow();
-			$(this).find(".filter-button").css({
-			'opacity': 1,
-			'width': '100%'});
 			$("#filter-header").text("Welcome to the FEMA Disaster Declaration Portal");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
@@ -70,9 +57,10 @@ $(document).ready(function(){
 	$("#type-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
 		$(this).find(".filter-caption").show();
+		$(".menu-icon").removeClass('open');
 		if (!clicked){
-			$(".filter-button").data('clicked', false);
-			$('.filter-button').css({'width' : '100%'});
+			$(this).addClass('open');
+			$(".menu-icon").data('clicked', false);
 			$(this).find(".filter-button").css({
 			'opacity':1,
 			'width': '100%'});
@@ -99,12 +87,10 @@ $(document).ready(function(){
 	$("#time-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
 		$(this).find(".filter-caption").show();
+		$(".menu-icon").removeClass('open');
 		if (!clicked){
-			$(".filter-button").data('clicked', false);
-			$('.filter-button').css({'width' : '100%'});
-			$(this).find(".filter-button").css({
-			'opacity': 1,
-			'width': '100%'});
+			$(this).addClass('open');
+			$(".menu-icon").data('clicked', false);
 			$("#filter-header").text("Filter by Temporal Range");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").show();
@@ -125,12 +111,10 @@ $(document).ready(function(){
 	$("#pie-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
 		$(this).find(".filter-caption").show();
+		$(".menu-icon").removeClass('open');
 		if (!clicked){
-			$(".filter-button").data('clicked', false);
-			$('.filter-button').css({'width' : '100%'});
-			$(this).find(".filter-button").css({
-			'opacity': 1,
-			'width': '100%'});
+			$(this).addClass('open');
+			$(".menu-icon").data('clicked', false);
 			$("#filter-header").text("Disaster Breakdown");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
@@ -152,12 +136,11 @@ $(document).ready(function(){
 	$("#settings-filter-icon").click(function(){
 		var clicked = $(this).data('clicked');
 		$(this).find(".filter-caption").show();
+		$(".menu-icon").removeClass('open');
 		if (!clicked){
-			$(".filter-button").data('clicked', false);
-			$('.filter-button').css({'width' : '100%'});
-			$(this).find('.filter-button').css({
-			'opacity': 1,
-			'width': '100%'});
+			$(this).addClass('open');
+			$(this).removeClass('closed');
+			$(".menu-icon").data('clicked', false);
 			$("#filter-header").text("Map Settings");
 			$('#disaster-grid').hide();
 			$("#temporal-filters").hide();
