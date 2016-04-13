@@ -270,17 +270,14 @@ $(document).ready(function(){
 		'margin-left':45 + "px",
 		'margin-right': $(this).width()*0.01 + 'px'
 	});
-	
-
-
-
 });//end doc ready fn
 
 //resize map on extra bar open
 function closeInfoWindow(){
 	$("#extra-bar").hide();
 	$("#map-window").addClass("col-xs-11").removeClass('col-xs-7');
-	$(".filter-button").data('clicked', false);
+	//$(".menu-icon").find('.filter-button').css({'width':'50%'})
+	$(".menu-icon").data('clicked', false);
 	updateMapScale(1000)//change the map to be bigger when there is not an info window
 }
 function openInfoWindow(){
