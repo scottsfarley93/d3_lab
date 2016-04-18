@@ -133,7 +133,7 @@ function loadDisasterData(){
 		success: function(response){
 			globals.filesLoaded += 1;
 			$("#filesLoaded").text(globals.filesLoaded);
-			globals.data.fema = response['data']; //this is the raw response in case we fuck up later and don't want to load it again
+			globals.data.fema = response['data']; //this is the raw response
 			_.each(globals.data.fema, function(value, key, list){
 				value['FIPSCode'] = checkFIPS(value.FIPSCode)
 			});
